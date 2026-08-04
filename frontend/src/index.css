@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@utility sakura-pattern {
+  background-color: #f7f9ff;
+  background-image: radial-gradient(#ffd9df 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.squish:active {
+  transform: scale(0.95);
+  transition: transform 0.1s ease-in-out;
+}
+
+.path-line {
+  position: absolute;
+  width: 4px;
+  background-color: #ffd9df;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+@layer base {
+  body {
+    background-color: #f7f9ff;
+    color: #091d2e;
+    font-family: Inter, sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    min-height: 100vh;
+    background-image: radial-gradient(#ffd9df 1px, transparent 1px);
+    background-size: 20px 20px;
+    margin: 0;
+  }
+}

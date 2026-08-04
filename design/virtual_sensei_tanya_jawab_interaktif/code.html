@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Virtual Sensei</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Noto+Sans+JP:wght@500;700&amp;family=Montserrat:wght@700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#3a4a49",
+                        "on-secondary-fixed": "#400009",
+                        "on-surface-variant": "#514345",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "surface-dim": "#c9dcf3",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "on-primary-container": "#7b4551",
+                        "background": "#f7f9ff",
+                        "inverse-on-surface": "#e8f2ff",
+                        "secondary": "#ba002c",
+                        "primary-container": "#ffb7c5",
+                        "on-tertiary-container": "#485858",
+                        "primary-fixed": "#ffd9df",
+                        "surface": "#f7f9ff",
+                        "secondary-fixed": "#ffdad9",
+                        "surface-container": "#e3efff",
+                        "outline": "#837375",
+                        "tertiary-fixed-dim": "#b8cac9",
+                        "surface-container-low": "#edf4ff",
+                        "surface-variant": "#d1e4fb",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#bccecd",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#203243",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#091d2e",
+                        "on-secondary-fixed-variant": "#920021",
+                        "surface-bright": "#f7f9ff",
+                        "tertiary": "#516161",
+                        "tertiary-fixed": "#d4e6e5",
+                        "on-primary-fixed": "#360c19",
+                        "on-secondary-container": "#fffbff",
+                        "inverse-primary": "#fbb3c1",
+                        "primary": "#864e5a",
+                        "secondary-container": "#df2842",
+                        "secondary-fixed-dim": "#ffb3b3",
+                        "surface-container-highest": "#d1e4fb",
+                        "surface-container-high": "#d9eaff",
+                        "on-tertiary-fixed": "#0e1e1e",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#864e5a",
+                        "outline-variant": "#d6c2c4",
+                        "on-background": "#091d2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-margin": "20px",
+                        "card-gap": "12px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-jp": ["Noto Sans JP"],
+                        "headline-lg": ["Montserrat"],
+                        "kanji-card": ["Noto Sans JP"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-jp": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "kanji-card": ["64px", { "lineHeight": "1.1", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .squishy {
+            transition: transform 0.15s ease-out;
+        }
+        .squishy:active {
+            transform: scale(0.95) translateY(2px);
+        }
+        .bouncing {
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen flex flex-col relative pb-32">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface-container docked full-width top-0 z-40 sticky shadow-sm">
+<div class="flex justify-between items-center w-full px-container-margin py-unit max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border-2 border-primary">
+<img class="w-full h-full object-cover" data-alt="A stylized minimalist avatar of a user in a vibrant, friendly app. The avatar features clean lines, a soft pastel color palette including mint green and light blue, set against a pristine white background. High key lighting, simple kawaii aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxGIXgB9YIiGrGOpYxDdtfhG6m-MRBzA2dtlz9Tp0_4DPYAIjfHV2cgXDUZaf3cAHplqm2IJcH-YY1MzNdMeTvDZvpfyY-ba5keSlP_2pbONSDvideiNv-aZ0LZRhAOINR0Y5HAkuNsakCFrxn2yRWUme2w9THNrNUNx-6gdvtu3Sr1Q7acCUhuXURyZeKgHY1b4mk9UvRP_mWqtduWTku47IwgIvdfx71rPzXGCRY1R4dU3OVLMFg"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">Virtual Sensei</h1>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-caps text-label-caps bg-surface-container-high px-3 py-1.5 rounded-full text-on-surface font-bold flex items-center gap-1 shadow-sm">
+                    🔥 7 | 1250 XP
+                </span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col max-w-4xl mx-auto w-full px-container-margin py-6 relative z-10">
+<!-- Character & Chat Area -->
+<section class="flex flex-col items-center justify-center mb-8 relative">
+<div class="w-48 h-48 md:w-64 md:h-64 rounded-full bg-tertiary-container/30 relative flex items-center justify-center mb-6 bouncing">
+<img class="w-40 h-40 md:w-56 md:h-56 object-contain z-10 relative" data-alt="A cute, 3D rendered Shiba Inu mascot wearing a traditional Japanese kimono. The character is stylized in a modern kawaii aesthetic with soft, rounded edges and vibrant, pastel colors (mint green, pink, and off-white). High quality studio lighting, soft shadows, centered on a light blue background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO-9pf25J5ovDdMn-GbPMD6JPS22OiXZiLqJq0lmGBLQrg8of_OOmCv5NzppP8jLPuXK9XnU72kzd5Kst6NZRi_0UALXB-QBFiwOlZyk3mLkNLLdGfzmpuLymA8j-RbmfXdcB0LZYxx2Hf2X78ZANt9A084fcGN_600M_HDeGCoInLhGYtz7a3BSxrqbIn8A6cHFR6ayHwnzRnT6D_oD8-Ye-yvueXZfOBbsWCWN7XCB8n-tMPlKJa"/>
+<!-- Decorative background elements -->
+<div class="absolute inset-0 bg-primary-container/20 rounded-full blur-2xl -z-10"></div>
+<span class="material-symbols-outlined absolute top-4 right-4 text-primary opacity-50 rotate-12" style="font-size: 32px;">stars</span>
+<span class="material-symbols-outlined absolute bottom-4 left-4 text-secondary opacity-50 -rotate-12" style="font-size: 24px;">auto_awesome</span>
+</div>
+<!-- Sensei Chat Bubble -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-2xl rounded-tl-sm shadow-md max-w-lg w-full relative">
+<div class="absolute -top-3 -left-2 w-4 h-4 bg-surface-container-lowest border-t border-l border-outline-variant rotate-45"></div>
+<p class="text-on-surface mb-3">Konnichiwa! I am your Virtual Sensei. Let's learn about the difference between <strong>WA (は)</strong> and <strong>GA (が)</strong>!</p>
+<div class="bg-surface-container-low p-4 rounded-xl border border-surface-variant">
+<p class="text-sm mb-2"><strong class="text-primary">は (Wa)</strong> is the topic marker. It sets up what we are talking about.</p>
+<p class="text-sm"><strong class="text-secondary">が (Ga)</strong> is the subject marker. It highlights new information or who specifically did the action.</p>
+</div>
+</div>
+</section>
+<!-- Quick Ask Suggestions -->
+<section class="w-full max-w-lg mx-auto mb-20">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-3 uppercase tracking-wider">Quick Ask</h3>
+<div class="flex flex-wrap gap-2">
+<button class="squishy bg-surface-container-low border border-primary/20 hover:border-primary/50 text-primary px-4 py-2 rounded-full font-body-md text-sm transition-colors shadow-sm">
+                    Partikel Ni (に)
+                </button>
+<button class="squishy bg-surface-container-low border border-primary/20 hover:border-primary/50 text-primary px-4 py-2 rounded-full font-body-md text-sm transition-colors shadow-sm">
+                    Bentuk Te (て)
+                </button>
+<button class="squishy bg-surface-container-low border border-primary/20 hover:border-primary/50 text-primary px-4 py-2 rounded-full font-body-md text-sm transition-colors shadow-sm">
+                    Kata Kerja
+                </button>
+<button class="squishy bg-surface-container-low border border-primary/20 hover:border-primary/50 text-primary px-4 py-2 rounded-full font-body-md text-sm transition-colors shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">search</span> More Topics
+                </button>
+</div>
+</section>
+</main>
+<!-- Floating Input Area -->
+<div class="fixed bottom-[80px] md:bottom-[20px] left-0 w-full px-container-margin z-40 flex justify-center pointer-events-none">
+<div class="bg-surface-container-lowest border border-outline-variant shadow-lg rounded-full p-2 flex items-center w-full max-w-2xl pointer-events-auto">
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-on-surface px-4 py-2 font-body-md outline-none" placeholder="Tanya Sensei..." type="text"/>
+<button class="squishy bg-primary text-on-primary w-10 h-10 rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(134,78,90,0.3)] hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface/80 dark:bg-surface-container/80 backdrop-blur-md docked full-width bottom-0 rounded-t-xl shadow-lg fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 border-t-0">
+<!-- Map -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">map</span>
+<span class="font-label-caps text-label-caps">Map</span>
+</a>
+<!-- Practice -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">style</span>
+<span class="font-label-caps text-label-caps">Practice</span>
+</a>
+<!-- Sensei (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-variant text-on-primary-container dark:text-on-primary-fixed-variant rounded-full px-4 py-1 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
+<span class="font-label-caps text-label-caps font-bold">Sensei</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+</body></html>

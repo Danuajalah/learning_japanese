@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Komorebi - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@700&amp;family=Noto+Sans+JP:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#091d2e",
+                      "inverse-surface": "#203243",
+                      "secondary-fixed": "#ffdad9",
+                      "secondary": "#ba002c",
+                      "outline": "#837375",
+                      "on-error": "#ffffff",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed-variant": "#3a4a49",
+                      "on-secondary-container": "#fffbff",
+                      "on-primary-container": "#7b4551",
+                      "on-surface-variant": "#514345",
+                      "surface-dim": "#c9dcf3",
+                      "on-primary-fixed": "#360c19",
+                      "on-error-container": "#93000a",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-container": "#485858",
+                      "on-primary-fixed-variant": "#6b3743",
+                      "surface-bright": "#f7f9ff",
+                      "primary-fixed-dim": "#fbb3c1",
+                      "primary": "#864e5a",
+                      "on-secondary-fixed": "#400009",
+                      "tertiary": "#516161",
+                      "primary-container": "#ffb7c5",
+                      "background": "#f7f9ff",
+                      "secondary-container": "#df2842",
+                      "surface-variant": "#d1e4fb",
+                      "on-tertiary": "#ffffff",
+                      "surface-container": "#e3efff",
+                      "on-background": "#091d2e",
+                      "on-tertiary-fixed": "#0e1e1e",
+                      "surface-container-highest": "#d1e4fb",
+                      "surface-container-high": "#d9eaff",
+                      "surface-tint": "#864e5a",
+                      "primary-fixed": "#ffd9df",
+                      "inverse-primary": "#fbb3c1",
+                      "outline-variant": "#d6c2c4",
+                      "tertiary-container": "#bccecd",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed-dim": "#ffb3b3",
+                      "tertiary-fixed": "#d4e6e5",
+                      "tertiary-fixed-dim": "#b8cac9",
+                      "surface-container-low": "#edf4ff",
+                      "surface": "#f7f9ff",
+                      "error-container": "#ffdad6",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed-variant": "#920021",
+                      "inverse-on-surface": "#e8f2ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "8px",
+                      "gutter": "16px",
+                      "container-margin": "20px",
+                      "card-gap": "12px"
+              },
+              "fontFamily": {
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "display-jp": [
+                              "Noto Sans JP"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "kanji-card": [
+                              "Noto Sans JP"
+                      ],
+                      "headline-lg-mobile": [
+                              "Montserrat"
+                      ],
+                      "headline-lg": [
+                              "Montserrat"
+                      ]
+              },
+              "fontSize": {
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-jp": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "kanji-card": [
+                              "64px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Tactile Gamification Specific Styles */
+        .squishy-btn {
+            transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .squishy-btn:active {
+            transform: scale(0.96) translateY(2px);
+            box-shadow: none !important;
+        }
+        .soft-sunk {
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .badge-ring {
+            background: conic-gradient(var(--tw-gradient-stops));
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md text-body-md min-h-screen pb-24 md:pb-0 pt-16 md:pt-20">
+<!-- TopAppBar (Web & Mobile) -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-sm shadow-primary/10 flex justify-between items-center px-container-margin h-16 md:h-20 w-full">
+<button class="md:hidden text-on-surface-variant dark:text-outline-variant hover:scale-105 transition-transform duration-200 active:scale-95 transition-all duration-150 p-2 -ml-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary dark:text-primary-fixed-dim tracking-tight">
+            Komorebi
+        </div>
+<!-- Web Nav Cluster (Hidden on Mobile) -->
+<nav class="hidden md:flex gap-8 items-center font-label-caps text-label-caps">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors flex items-center gap-2 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="map">map</span>
+                Roadmap
+            </a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors flex items-center gap-2 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="chat_bubble">chat_bubble</span>
+                Sensei
+            </a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors flex items-center gap-2 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="edit_note">edit_note</span>
+                Write
+            </a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary transition-colors flex items-center gap-2 group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" data-icon="style">style</span>
+                SRS
+            </a>
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary pb-1 flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+                Profile
+            </a>
+</nav>
+<div class="md:hidden w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A close up, stylized illustration of an abstract, cute character face in a soft pink and white color palette. The aesthetic is clean, modern, and slightly kawaii, reflecting a cheerful learning app avatar. The lighting is flat and vector-like." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxVOf-MfW2hhfDsD-eHSevtoYKZMuoRjAYCI5iEzgr57MoAh8Z_a7upS7FA7vyJXZuDUiCzBoDwNqLgjJq2HMzCyunMKIKVOsrjs-ADmpDvrR_tc4vqOU9rINr1c8gq5M-tNnhPtklcDUvx_bLZTjg5s_YQhykKbEtvrNSya-zK7KFuo66rJf3SKiW9t2AUkOyAItBhFb_1AfoCm6AWFsBCo6DRkAJEf1nI-96_I75vZXKFCyZa5PX"/>
+</div>
+</header>
+<main class="max-w-[1140px] mx-auto px-container-margin md:px-8 pb-12">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 mt-8">
+<!-- Left Column: Profile Card & Settings -->
+<div class="md:col-span-4 flex flex-col gap-6">
+<!-- Profile Identity Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm flex flex-col items-center text-center relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-full h-24 bg-primary-container/30 rounded-t-xl -z-0"></div>
+<div class="relative w-24 h-24 rounded-full border-4 border-surface-container-lowest shadow-md mb-4 mt-8 z-10">
+<img class="w-full h-full object-cover rounded-full" data-alt="A close up, stylized illustration of an abstract, cute character face in a soft pink and white color palette. The aesthetic is clean, modern, and slightly kawaii, reflecting a cheerful learning app avatar. The lighting is flat and vector-like." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtQQig6vnJijJj5dczoLgF-enf2PLMnHlV5XuI7ul_feWoBrF4c2tatgCCS6jDC3gBYfn62QL9GtaHYKuFhb9b2U-gvlBpaGP3Nwvitvzbf5Piv6a0KCZkmPZ_2Uq0L2E8bmhk5fp6WYhsLSPQZDm4AcEwRztNLdZfDK-m8GiMax2up6Z_CWSr5P9MhYQMVbXgfBi-ZQWWzdz-daXdaGZlBEPzin1BTeJ900xn4lgbo1LcsfOUW6_N"/>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full p-1.5 shadow-md hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[16px]" data-icon="edit">edit</span>
+</button>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1 z-10">Andi Pratama</h1>
+<div class="inline-flex items-center gap-1.5 bg-primary/10 text-primary px-3 py-1 rounded-full font-label-caps text-label-caps mb-4 z-10">
+<span class="material-symbols-outlined text-[14px]" data-icon="school">school</span>
+                        JLPT N5 Voyager
+                    </div>
+<p class="text-on-surface-variant text-sm px-4 z-10">"Every kanji learned is a step closer to Tokyo."</p>
+</div>
+<!-- Settings Menu -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-2 shadow-sm">
+<ul class="flex flex-col">
+<li>
+<button class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-surface-container transition-colors group text-left">
+<div class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="person_outline">person_outline</span>
+<span>Edit Profil</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+</li>
+<li>
+<button class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-surface-container transition-colors group text-left">
+<div class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="notifications">notifications</span>
+<span>Notifikasi</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+</li>
+<li>
+<button class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-surface-container transition-colors group text-left">
+<div class="flex items-center gap-3 text-on-surface">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors" data-icon="settings">settings</span>
+<span>Pengaturan Akun</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant" data-icon="chevron_right">chevron_right</span>
+</button>
+</li>
+<li class="border-t border-outline-variant mt-2 pt-2">
+<button class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-error-container/30 transition-colors group text-left">
+<div class="flex items-center gap-3 text-error">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span>Keluar</span>
+</div>
+</button>
+</li>
+</ul>
+</div>
+</div>
+<!-- Right Column: Stats, Progress, Badges -->
+<div class="md:col-span-8 flex flex-col gap-8">
+<!-- Bento Stats -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 shadow-sm hover:-translate-y-1 transition-transform duration-300">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-full bg-[#ffecd2] text-[#f2994a] flex items-center justify-center text-xl">
+                                🔥
+                            </div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Streak</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">7 Days</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 shadow-sm hover:-translate-y-1 transition-transform duration-300">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-full bg-[#fff4cc] text-[#f2c94c] flex items-center justify-center text-xl">
+                                ⭐
+                            </div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Total XP</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">1,250</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-4 shadow-sm hover:-translate-y-1 transition-transform duration-300 col-span-2 md:col-span-1">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center text-xl">
+                                📚
+                            </div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Kanji Mastered</span>
+</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">120 <span class="text-sm font-body-md text-outline font-normal">/ 2,136</span></div>
+</div>
+</div>
+<!-- Progress Section -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-6 uppercase tracking-wider">Current Goals</h2>
+<div class="space-y-6">
+<!-- JLPT N5 Goal -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<div>
+<h3 class="font-bold text-on-surface">Master JLPT N5 Vocabulary</h3>
+<p class="text-sm text-outline">450 / 800 Words</p>
+</div>
+<span class="font-label-caps text-label-caps text-primary">56%</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-3 overflow-hidden soft-sunk">
+<div class="bg-primary h-3 rounded-full relative" style="width: 56%">
+<div class="absolute inset-0 bg-white/20" style="background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);"></div>
+</div>
+</div>
+</div>
+<!-- Hiragana Goal -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<div>
+<h3 class="font-bold text-on-surface">Perfect Hiragana Recall</h3>
+<p class="text-sm text-outline">46 / 46 Characters</p>
+</div>
+<span class="font-label-caps text-label-caps text-[#4ade80]">100%</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-3 overflow-hidden soft-sunk">
+<div class="bg-[#4ade80] h-3 rounded-full" style="width: 100%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Achievements Grid -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant p-6 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Achievements</h2>
+<button class="text-primary text-sm font-label-caps text-label-caps hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Badge 1: Mastered -->
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-20 h-20 rounded-full bg-[#E0F2F1] p-1 mb-3 shadow-[0_4px_12px_rgba(224,242,241,0.5)] group-hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-full rounded-full border-2 border-white flex items-center justify-center bg-white overflow-hidden relative">
+<div class="absolute inset-0 bg-[#E0F2F1]/20"></div>
+<span class="text-3xl relative z-10">あ</span>
+</div>
+</div>
+<h4 class="font-label-caps text-label-caps text-on-surface">Hiragana Hero</h4>
+<p class="text-xs text-outline mt-1">Mastered</p>
+</div>
+<!-- Badge 2: Earned -->
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-20 h-20 rounded-full bg-primary-container p-1 mb-3 shadow-[0_4px_12px_rgba(255,183,197,0.4)] group-hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-full rounded-full border-2 border-white flex items-center justify-center bg-white overflow-hidden relative">
+<div class="absolute inset-0 bg-primary-container/20"></div>
+<span class="text-3xl relative z-10">一</span>
+</div>
+</div>
+<h4 class="font-label-caps text-label-caps text-on-surface">Kanji Novice</h4>
+<p class="text-xs text-outline mt-1">Earned 2d ago</p>
+</div>
+<!-- Badge 3: Earned -->
+<div class="flex flex-col items-center text-center group cursor-pointer">
+<div class="w-20 h-20 rounded-full bg-[#fff4cc] p-1 mb-3 shadow-[0_4px_12px_rgba(255,244,204,0.4)] group-hover:-translate-y-2 transition-transform duration-300">
+<div class="w-full h-full rounded-full border-2 border-white flex items-center justify-center bg-white overflow-hidden relative">
+<div class="absolute inset-0 bg-[#fff4cc]/30"></div>
+<span class="material-symbols-outlined text-3xl text-[#f2c94c] relative z-10" data-icon="school">school</span>
+</div>
+</div>
+<h4 class="font-label-caps text-label-caps text-on-surface">First Lesson</h4>
+<p class="text-xs text-outline mt-1">Earned 7d ago</p>
+</div>
+<!-- Badge 4: Locked -->
+<div class="flex flex-col items-center text-center opacity-50 grayscale group">
+<div class="w-20 h-20 rounded-full bg-surface-variant p-1 mb-3 border-2 border-dashed border-outline-variant">
+<div class="w-full h-full rounded-full flex items-center justify-center bg-surface-container-lowest">
+<span class="material-symbols-outlined text-3xl text-outline" data-icon="lock">lock</span>
+</div>
+</div>
+<h4 class="font-label-caps text-label-caps text-on-surface">N5 Scholar</h4>
+<p class="text-xs text-outline mt-1">Locked</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/90 dark:bg-inverse-surface/90 backdrop-blur-xl shadow-lg border-t border-transparent" style="box-shadow: 0 -4px 12px rgba(134,78,90,0.1);">
+<div class="fixed bottom-0 left-0 w-full h-20 flex justify-around items-center px-4 pb-2">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="map">map</span>
+<span class="font-label-caps text-label-caps">Roadmap</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-label-caps text-label-caps">Sensei</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="edit_note">edit_note</span>
+<span class="font-label-caps text-label-caps">Write</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:text-primary dark:hover:text-primary-fixed active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="style">style</span>
+<span class="font-label-caps text-label-caps">SRS</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-on-primary-fixed-variant text-on-primary-container dark:text-primary-fixed rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person" data-weight="fill" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-caps text-label-caps text-primary">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

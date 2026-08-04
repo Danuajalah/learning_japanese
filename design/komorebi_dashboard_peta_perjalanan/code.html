@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Komorebi Learning - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@700&amp;family=Noto+Sans+JP:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#3a4a49",
+                        "on-secondary-fixed": "#400009",
+                        "on-surface-variant": "#514345",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "surface-dim": "#c9dcf3",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "on-primary-container": "#7b4551",
+                        "background": "#f7f9ff",
+                        "inverse-on-surface": "#e8f2ff",
+                        "secondary": "#ba002c",
+                        "primary-container": "#ffb7c5",
+                        "on-tertiary-container": "#485858",
+                        "primary-fixed": "#ffd9df",
+                        "surface": "#f7f9ff",
+                        "secondary-fixed": "#ffdad9",
+                        "surface-container": "#e3efff",
+                        "outline": "#837375",
+                        "tertiary-fixed-dim": "#b8cac9",
+                        "surface-container-low": "#edf4ff",
+                        "surface-variant": "#d1e4fb",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#bccecd",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#203243",
+                        "on-primary": "#ffffff",
+                        "on-surface": "#091d2e",
+                        "on-secondary-fixed-variant": "#920021",
+                        "surface-bright": "#f7f9ff",
+                        "tertiary": "#516161",
+                        "tertiary-fixed": "#d4e6e5",
+                        "on-primary-fixed": "#360c19",
+                        "on-secondary-container": "#fffbff",
+                        "inverse-primary": "#fbb3c1",
+                        "primary": "#864e5a",
+                        "secondary-container": "#df2842",
+                        "secondary-fixed-dim": "#ffb3b3",
+                        "surface-container-highest": "#d1e4fb",
+                        "surface-container-high": "#d9eaff",
+                        "on-tertiary-fixed": "#0e1e1e",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#864e5a",
+                        "outline-variant": "#d6c2c4",
+                        "on-background": "#091d2e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-margin": "20px",
+                        "card-gap": "12px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-jp": ["Noto Sans JP"],
+                        "headline-lg": ["Montserrat"],
+                        "kanji-card": ["Noto Sans JP"],
+                        "label-caps": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-jp": ["48px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "kanji-card": ["64px", { "lineHeight": "1.1", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .squish:active { transform: scale(0.95); transition: transform 0.1s ease-in-out; }
+        .sakura-pattern {
+            background-color: #f7f9ff;
+            background-image: radial-gradient(#ffd9df 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .path-line {
+            position: absolute;
+            width: 4px;
+            background-color: #ffd9df;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-24 sakura-pattern">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 bg-surface dark:bg-surface-container w-full">
+<div class="flex justify-between items-center w-full px-container-margin py-unit max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A stylized digital avatar of an anime-style character representing a Japanese language student. Clean lines, soft pastel colors, friendly expression. The avatar is set against a solid off-white background to match a clean minimalist UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDX72G9rW_tB-mUQFiSNvYwcwH3UKticvwD1wOe4laDw0o0mDwnGrknYyCXVC3eDwV0GN4k1BwUsJHITKzZvCfjgN2YFvO8yWPsD4kHja2WVNLyYobofjhc3nSYpzVJfNnjwDHJM8EFKun9B6bo20H7VyjmuyJMSY2KTFdj9lhMpUpcXk47wmEPb-85JqPKRVVZt2g_NuvHSH1yqbtE4dqcLA1KXTWPPc3PqgtVyENmUFt3QWYwFgaI"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim">Komorebi Learning</h1>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full shadow-sm">
+<span class="text-secondary-container">🔥</span>
+<span class="font-label-caps text-label-caps text-on-surface font-bold tracking-wide">7 | 1250 XP</span>
+</div>
+</div>
+</header>
+<main class="px-container-margin py-6 max-w-lg mx-auto md:max-w-4xl relative z-10">
+<!-- Daily Goal Card -->
+<section class="bg-surface-container-lowest rounded-xl p-5 mb-8 shadow-sm border border-surface-variant relative overflow-hidden group hover:shadow-md transition-shadow">
+<div class="absolute right-0 top-0 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined text-9xl text-primary" style="font-variation-settings: 'FILL' 1;">target</span>
+</div>
+<div class="relative z-10">
+<h2 class="font-label-caps text-label-caps text-outline mb-1 uppercase">Daily Goal</h2>
+<div class="flex justify-between items-end mb-3">
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">3/5 Lessons</p>
+<span class="font-label-caps text-label-caps text-primary bg-primary-container px-2 py-1 rounded-md">60%</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-3">
+<div class="bg-primary h-3 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+</section>
+<!-- Learning Roadmap (Peta Perjalanan) -->
+<section class="relative pt-4 pb-12">
+<div class="path-line h-full top-0"></div>
+<div class="flex flex-col gap-16 relative z-10">
+<!-- Lesson 1 (Completed) -->
+<div class="flex flex-col items-center group cursor-pointer squish">
+<div class="w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg border-4 border-surface-container-lowest z-10 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="mt-3 bg-surface-container-lowest px-4 py-2 rounded-xl shadow-sm border border-surface-variant text-center">
+<p class="font-label-caps text-label-caps text-outline uppercase tracking-wider mb-1">Unit 1</p>
+<p class="font-headline-lg-mobile text-lg font-bold text-on-surface">Hiragana (ひらがな)</p>
+</div>
+</div>
+<!-- Lesson 2 (Completed) -->
+<div class="flex flex-col items-center group cursor-pointer squish ml-12">
+<div class="w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg border-4 border-surface-container-lowest z-10 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="mt-3 bg-surface-container-lowest px-4 py-2 rounded-xl shadow-sm border border-surface-variant text-center">
+<p class="font-label-caps text-label-caps text-outline uppercase tracking-wider mb-1">Unit 2</p>
+<p class="font-headline-lg-mobile text-lg font-bold text-on-surface">Katakana (カタカナ)</p>
+</div>
+</div>
+<!-- Lesson 3 (Current/Active) -->
+<div class="flex flex-col items-center group cursor-pointer squish mr-8 relative">
+<div class="absolute w-24 h-24 bg-primary-container rounded-full animate-ping opacity-50 z-0"></div>
+<div class="w-24 h-24 rounded-full bg-surface-container-lowest border-4 border-primary text-primary flex items-center justify-center shadow-xl z-10 hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="mt-4 bg-primary px-5 py-3 rounded-xl shadow-md text-center">
+<p class="font-label-caps text-label-caps text-primary-fixed uppercase tracking-wider mb-1">Unit 3</p>
+<p class="font-headline-lg-mobile text-xl font-bold text-on-primary">N5 Grammar Intro</p>
+</div>
+</div>
+<!-- Lesson 4 (Locked) -->
+<div class="flex flex-col items-center opacity-50 ml-6">
+<div class="w-16 h-16 rounded-full bg-surface-variant text-outline flex items-center justify-center shadow-sm border-2 border-surface-container-lowest z-10">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div class="mt-2 text-center">
+<p class="font-body-md text-sm font-semibold text-outline">Basic Greetings</p>
+</div>
+</div>
+<!-- Lesson 5 (Locked) -->
+<div class="flex flex-col items-center opacity-50 mr-12">
+<div class="w-16 h-16 rounded-full bg-surface-variant text-outline flex items-center justify-center shadow-sm border-2 border-surface-container-lowest z-10">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<div class="mt-2 text-center">
+<p class="font-body-md text-sm font-semibold text-outline">Numbers &amp; Time</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-surface/80 dark:bg-surface-container/80 backdrop-blur-md rounded-t-xl shadow-lg border-t-0 md:hidden">
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-variant text-on-primary-container dark:text-on-primary-fixed-variant rounded-full px-4 py-1 hover:scale-105 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">map</span>
+<span class="font-label-caps text-label-caps">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim hover:scale-105 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">style</span>
+<span class="font-label-caps text-label-caps">Practice</span>
+</a>
+<!-- FAB style middle button -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim hover:scale-105 active:scale-90 transition-all duration-150 -mt-8" href="#">
+<div class="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-on-primary shadow-lg border-4 border-surface-container-lowest">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">record_voice_over</span>
+</div>
+<span class="font-label-caps text-label-caps mt-1">Sensei</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim hover:scale-105 active:scale-90 transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-2xl mb-1">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+<!-- Desktop Navigation (Hidden on Mobile) -->
+<nav class="hidden md:flex fixed top-0 left-1/2 transform -translate-x-1/2 mt-4 bg-surface-container-lowest shadow-md rounded-full px-6 py-2 z-50 items-center gap-8 border border-surface-variant">
+<a class="flex items-center gap-2 text-primary font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-label-caps text-label-caps">Map</span>
+</a>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">style</span>
+<span class="font-label-caps text-label-caps">Practice</span>
+</a>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">record_voice_over</span>
+<span class="font-label-caps text-label-caps">Sensei</span>
+</a>
+<a class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+</body></html>
