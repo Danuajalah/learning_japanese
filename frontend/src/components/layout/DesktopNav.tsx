@@ -1,11 +1,16 @@
-import { navItemsData } from '@/data/navItems'
-
 const iconMap: Record<string, string> = {
   map: 'map',
   practice: 'style',
   sensei: 'record_voice_over',
   profile: 'person',
 }
+
+const navItemsData = [
+  { id: 'map', label: 'Map', icon: 'map' },
+  { id: 'practice', label: 'Practice', icon: 'style' },
+  { id: 'sensei', label: 'Sensei', icon: 'record_voice_over' },
+  { id: 'profile', label: 'Profile', icon: 'person' },
+]
 
 export default function DesktopNav({ active = 'map' }: { active?: string }) {
   return (
@@ -22,7 +27,10 @@ export default function DesktopNav({ active = 'map' }: { active?: string }) {
               ${isActive ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}
             `}
           >
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: `'FILL' ${isActive ? 1 : 0}` }}>
+            <span
+              className="material-symbols-outlined"
+              {...(isActive && { style: { fontVariationSettings: "'FILL' 1" } })}
+            >
               {iconMap[item.id]}
             </span>
             <span>{item.label}</span>

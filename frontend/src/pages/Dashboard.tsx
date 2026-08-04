@@ -17,7 +17,7 @@ export default function Dashboard() {
   }, [])
 
   return (
-    <>
+    <div className="bg-background text-on-background font-body-md min-h-screen pb-24 sakura-pattern">
       <TopAppBar />
       <DesktopNav active="map" />
       <main className="px-container-margin py-6 max-w-lg mx-auto md:max-w-4xl relative z-10">
@@ -25,6 +25,6 @@ export default function Dashboard() {
         <LearningRoadmap />
       </main>
       <BottomNavBar active="map" />
-    </>
+    </div>
   )
 }

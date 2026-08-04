@@ -62,8 +62,6 @@ const sampleLessons: Lesson[] = [
   },
 ]
 
-const positions = ['left', 'right', 'center', 'right', 'left'] as const
-
 export default function LearningRoadmap() {
   const [lessons, setLessons] = useState<Lesson[]>(sampleLessons)
   const [loading, setLoading] = useState(false)
@@ -95,14 +93,11 @@ export default function LearningRoadmap() {
     <section className="relative pt-4 pb-12">
       <div className="path-line h-full top-0"></div>
       <div className="flex flex-col gap-16 relative z-10">
-        {lessons.map((lesson, index) => (
-          <LessonNode
-            key={lesson.id}
-            lesson={lesson}
-            position={positions[index % positions.length]}
-            showAnimation={lesson.status === 'in_progress'}
-          />
-        ))}
+        <LessonNode lesson={lessons[0]} />
+        <LessonNode lesson={lessons[1]} marginLeft="ml-12" />
+        <LessonNode lesson={lessons[2]} marginRight="mr-8" />
+        <LessonNode lesson={lessons[3]} marginLeft="ml-6" />
+        <LessonNode lesson={lessons[4]} marginRight="mr-12" />
       </div>
     </section>
   )

@@ -30,9 +30,11 @@ class AuthController extends Controller
         }
 
         if ($response->failed()) {
+            $error = $response->json('error', 'Authentication failed');
+            $message = $response->json('msg', $error);
             return response()->json([
                 'success' => false,
-                'message' => 'Authentication failed',
+                'message' => $message,
             ], 401);
         }
 

@@ -39,7 +39,7 @@ export class LearningService {
       const res = await apiFetch<UserProfile>('/user')
       if (!res.success) return null
       return res.data
-    } catch (error) {
+    } catch {
       return null
     }
   }
@@ -88,8 +88,40 @@ export class LearningService {
 }
 
 export const Auth = {
+  signUpWithPassword: async (email: string, password: string, fullName?: string, username?: string) => {
+    return await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          ...(fullName && { full_name: fullName }),
+          ...(username && { user_name: username }),
+        },
+      },
+    })
+  },
+
+  signInWithPassword: async (email: string, password: string) => {
+    return await supabase.auth.signInWithPassword({ email, password })
+  },
+
   signIn: async (email: string) => {
     return await supabase.auth.signInWithOtp({ email })
+  },
+
+  signInWithGoogle: async (redirectTo?: string) => {
+    const redirectPath = redirectTo || window.location.origin
+    return await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${redirectPath}/auth/callback`,
+      },
+    })
+  },
+
+  handleOAuthCallback: async () => {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    return { session, error }
   },
 
   signOut: async () => {
@@ -103,5 +135,10 @@ export const Auth = {
   getUser: async () => {
     const { data: { user } } = await supabase.auth.getUser()
     return user
+  },
+
+  getSession: async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    return session
   },
 }

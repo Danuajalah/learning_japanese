@@ -1,117 +1,67 @@
-import type { Lesson, LessonStatus } from '@/types'
+import type { Lesson } from '@/types'
 import { cx } from '@/lib/utils'
 
 interface LessonNodeProps {
   lesson: Lesson
-  position: 'left' | 'right' | 'center'
-  showAnimation?: boolean
+  marginLeft?: string
+  marginRight?: string
 }
 
-const statusConfig: Record<LessonStatus, {
-  size: string
-  bgColor: string
-  textColor: string
-  borderColor: string
-  iconSize: string
-  icon: string
-  fill: number
-  cardBg: string
-  cardText: string
-  cardBorder: string
-}> = {
+const statusConfig = {
   completed: {
-    size: 'w-20 h-20',
-    bgColor: 'bg-primary',
-    textColor: 'text-on-primary',
-    borderColor: 'border-4 border-surface-container-lowest',
-    iconSize: 'text-4xl',
+    circle: 'w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg border-4 border-surface-container-lowest z-10 hover:scale-105 transition-transform',
     icon: 'star',
-    fill: 1,
-    cardBg: 'bg-surface-container-lowest',
-    cardText: 'text-on-surface',
-    cardBorder: 'border-surface-variant',
+    iconSize: 'text-4xl',
+    card: 'mt-3 bg-surface-container-lowest px-4 py-2 rounded-xl shadow-sm border border-surface-variant text-center',
+    titleClass: 'text-on-surface text-lg font-bold',
   },
   in_progress: {
-    size: 'w-24 h-24',
-    bgColor: 'bg-surface-container-lowest',
-    textColor: 'text-primary',
-    borderColor: 'border-4 border-primary',
-    iconSize: 'text-5xl',
+    circle: 'w-24 h-24 rounded-full bg-surface-container-lowest border-4 border-primary text-primary flex items-center justify-center shadow-xl z-10 hover:scale-105 transition-transform',
     icon: 'play_arrow',
-    fill: 1,
-    cardBg: 'bg-primary',
-    cardText: 'text-on-primary',
-    cardBorder: 'border-primary',
+    iconSize: 'text-5xl',
+    card: 'mt-4 bg-primary px-5 py-3 rounded-xl shadow-md text-center',
+    titleClass: 'text-on-primary text-xl font-bold',
   },
   locked: {
-    size: 'w-16 h-16',
-    bgColor: 'bg-surface-variant',
-    textColor: 'text-outline',
-    borderColor: 'border-2 border-surface-container-lowest',
-    iconSize: 'text-2xl',
+    circle: 'w-16 h-16 rounded-full bg-surface-variant text-outline flex items-center justify-center shadow-sm border-2 border-surface-container-lowest z-10',
     icon: 'lock',
-    fill: 1,
-    cardBg: 'bg-surface-container-lowest',
-    cardText: 'text-on-surface',
-    cardBorder: 'border-surface-variant',
+    iconSize: 'text-2xl',
+    card: 'mt-2 text-center',
+    titleClass: 'text-outline text-sm font-semibold',
   },
 }
 
-export default function LessonNode({ lesson, position, showAnimation = false }: LessonNodeProps) {
-  const cfg = statusConfig[lesson.status]
+export default function LessonNode({ lesson, marginLeft, marginRight }: LessonNodeProps) {
+  const cfg = statusConfig[lesson.status as keyof typeof statusConfig]
   const isLocked = lesson.status === 'locked'
-
-  const positionClasses = {
-    left: 'ml-12',
-    right: 'mr-12',
-    center: 'mr-8',
-  }
 
   return (
     <div className={cx(
-      'flex flex-col items-center relative',
-      'group cursor-pointer',
-      'squish:active',
+      'flex flex-col items-center group cursor-pointer squish',
       isLocked && 'opacity-50',
-      positionClasses[position],
+      marginLeft,
+      marginRight,
     )}>
-      {showAnimation && (
+      {lesson.status === 'in_progress' && (
         <div className="absolute w-24 h-24 bg-primary-container rounded-full animate-ping opacity-50 z-0"></div>
       )}
 
-      <div className={cx(
-        'rounded-full flex items-center justify-center z-10',
-        'hover:scale-105 transition-transform',
-        cfg.size,
-        cfg.bgColor,
-        cfg.textColor,
-        cfg.borderColor,
-        lesson.status === 'in_progress' && 'shadow-xl',
-        lesson.status === 'completed' && 'shadow-lg',
-        lesson.status === 'locked' && 'shadow-sm',
-      )}>
+      <div className={cx('rounded-full flex items-center justify-center', cfg.circle)}>
         <span
           className={cx('material-symbols-outlined', cfg.iconSize)}
-          style={{ fontVariationSettings: `'FILL' ${cfg.fill}` }}
+          style={{ fontVariationSettings: "'FILL' 1" }}
         >
           {cfg.icon}
         </span>
       </div>
 
-      <div className={cx(
-        'mt-3 px-4 py-2 rounded-xl shadow-sm border text-center',
-        cfg.cardBg,
-        cfg.cardBorder,
-        lesson.status === 'in_progress' && 'shadow-md',
-      )}>
-        <p className="font-label-caps text-label-caps text-outline uppercase tracking-wider mb-1">
-          Unit {lesson.unit_number}
-        </p>
-        <p className={cx(
-          'font-headline-lg-mobile font-bold',
-          lesson.status === 'in_progress' ? 'text-xl' : 'text-lg',
-          cfg.cardText,
-        )}>
+      <div className={cx(cfg.card)}>
+        {lesson.status !== 'locked' && (
+          <p className="font-label-caps text-label-caps text-outline uppercase tracking-wider mb-1">
+            Unit {lesson.unit_number}
+          </p>
+        )}
+        <p className={cx('font-headline-lg-mobile', cfg.titleClass)}>
           {lesson.title}
         </p>
       </div>
