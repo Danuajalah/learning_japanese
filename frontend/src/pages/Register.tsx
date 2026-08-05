@@ -10,6 +10,7 @@ export default function Register() {
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showVerification, setShowVerification] = useState(false)
 
   const handleRegister = async () => {
     if (!email || !password) return
@@ -21,7 +22,7 @@ export default function Register() {
       if (authError) {
         setError(authError.message)
       } else {
-        navigate('/')
+        setShowVerification(true)
       }
     } catch {
       setError('Registration failed. Please try again.')
@@ -43,6 +44,38 @@ export default function Register() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  if (showVerification) {
+    return (
+      <div className="bg-background min-h-screen flex items-center justify-center p-container-margin md:p-8 overflow-x-hidden antialiased text-on-surface font-body-md">
+        <div className="fixed top-[-10%] right-[-10%] w-96 h-96 bg-primary-container/30 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+        <div className="fixed bottom-[-10%] left-[-10%] w-80 h-80 bg-surface-variant/40 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+
+        <main className="w-full max-w-[440px] bg-surface-container-lowest rounded-[24px] shadow-[0_12px_32px_rgba(255,183,197,0.15)] border border-outline-variant/20 p-8 md:p-10 flex flex-col items-center text-center relative z-10">
+          <div className="flex items-center justify-center w-20 h-20 bg-primary-container/10 rounded-full mb-6">
+            <span
+              className="material-symbols-outlined text-primary text-5xl"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              mark_email_read
+            </span>
+          </div>
+          <h1 className="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-primary tracking-tight mb-4">
+            Cek Email Anda
+          </h1>
+          <p className="font-body-md text-body-md text-on-surface-variant mb-6">
+            Kami telah mengirimkan email konfirmasi ke <strong>{email}</strong>. Silakan buka email dan klik tautan konfirmasi sebelum masuk.
+          </p>
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full h-14 bg-primary text-on-primary rounded-xl font-label-caps text-label-caps shadow-[0_8px_20px_rgba(134,78,90,0.25)] hover:bg-on-primary-fixed-variant squish-click flex items-center justify-center gap-2 transition-colors"
+          >
+            <span>Kembali ke Masuk</span>
+          </button>
+        </main>
+      </div>
+    )
   }
 
   return (

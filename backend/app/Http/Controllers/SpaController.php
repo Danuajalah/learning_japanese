@@ -10,7 +10,7 @@ class SpaController extends Controller
 {
     public function __invoke(Request $request)
     {
-        $path = public_path('../frontend/dist/index.html');
+        $path = public_path('index.html');
 
         if (!File::exists($path)) {
             if (app()->environment('local')) {

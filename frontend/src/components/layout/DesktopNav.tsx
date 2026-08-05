@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 const iconMap: Record<string, string> = {
   map: 'map',
   practice: 'style',
@@ -6,10 +8,10 @@ const iconMap: Record<string, string> = {
 }
 
 const navItemsData = [
-  { id: 'map', label: 'Map', icon: 'map' },
-  { id: 'practice', label: 'Practice', icon: 'style' },
-  { id: 'sensei', label: 'Sensei', icon: 'record_voice_over' },
-  { id: 'profile', label: 'Profile', icon: 'person' },
+  { id: 'map', label: 'Map', icon: 'map', path: '/' },
+  { id: 'practice', label: 'Practice', icon: 'style', path: '/practice' },
+  { id: 'sensei', label: 'Sensei', icon: 'record_voice_over', path: '/sensei' },
+  { id: 'profile', label: 'Profile', icon: 'person', path: '/profile' },
 ]
 
 export default function DesktopNav({ active = 'map' }: { active?: string }) {
@@ -18,9 +20,9 @@ export default function DesktopNav({ active = 'map' }: { active?: string }) {
       {navItemsData.map((item) => {
         const isActive = item.id === active
         return (
-          <a
+          <Link
             key={item.id}
-            href="#"
+            to={item.path}
             className={`
               flex items-center gap-2 font-label-caps text-label-caps
               transition-colors
@@ -34,7 +36,7 @@ export default function DesktopNav({ active = 'map' }: { active?: string }) {
               {iconMap[item.id]}
             </span>
             <span>{item.label}</span>
-          </a>
+          </Link>
         )
       })}
     </nav>

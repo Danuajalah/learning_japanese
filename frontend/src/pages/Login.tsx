@@ -3,19 +3,27 @@ import { Link } from 'react-router-dom'
 import { Auth } from '@/services/api'
 
 export default function Login() {
-  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!username || !password) return
+    if (!email || !password) return
 
     setError('')
+    setShowEmailConfirm(false)
     try {
-      const { error: authError } = await Auth.signInWithPassword(username, password)
-      if (authError) setError(authError.message)
+      const { error: authError } = await Auth.signInWithPassword(email, password)
+      if (authError) {
+        const msg = authError.message.toLowerCase()
+        if (msg.includes('confirm') || msg.includes('not confirmed') || msg.includes('email')) {
+          setShowEmailConfirm(true)
+        }
+        setError(authError.message)
+      }
     } catch {
       setError('Login failed. Please try again.')
     }
@@ -43,27 +51,35 @@ export default function Login() {
           </p>
         </div>
 
+        {showEmailConfirm && (
+          <div className="mb-4 p-3 bg-primary-container/10 border border-primary/30 rounded-lg">
+            <p className="font-body-md text-sm text-primary">
+              Email belum dikonfirmasi. Silakan periksa kotak masuk email Anda (termasuk folder spam) untuk konfirmasi akun.
+            </p>
+          </div>
+        )}
+
         {error && (
           <div className="mb-4 p-3 bg-error-container/10 border border-error/30 rounded-lg">
             <p className="font-body-md text-sm text-error">{error}</p>
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form className="space-y-6">
           <div className="space-y-4">
             <div>
               <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2">
-                USERNAME
+                EMAIL
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-                  <span className="material-symbols-outlined text-[20px]">person</span>
+                  <span className="material-symbols-outlined text-[20px]">mail</span>
                 </div>
                 <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Masukkan username"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="nama@email.com"
                   required
                   className="soft-sunk-input w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-[#E0E0E0] rounded-lg text-on-surface focus:outline-none focus:border-primary focus:ring-0 font-body-md text-body-md placeholder:text-outline-variant"
                 />
