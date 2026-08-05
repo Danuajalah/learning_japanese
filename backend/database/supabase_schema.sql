@@ -230,3 +230,54 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row
   execute procedure public.handle_new_user();
+
+-- ============================================================
+-- Table: chat_conversations
+-- ============================================================
+create table public.chat_conversations (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users not null,
+  title text not null default 'New Conversation',
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now()
+);
+
+-- ============================================================
+-- Table: chat_messages
+-- ============================================================
+create table public.chat_messages (
+  id uuid primary key default uuid_generate_v4(),
+  conversation_id uuid references public.chat_conversations on delete cascade not null,
+  role text not null check (role in ('user', 'assistant')),
+  content text not null,
+  created_at timestamp with time zone default now()
+);
+
+-- Index for ordering messages by creation time
+create index chat_messages_conversation_created_idx on public.chat_messages (conversation_id, created_at);
+
+-- ============================================================
+-- Row Level Security for chat tables
+-- ============================================================
+alter table public.chat_conversations enable row level security;
+alter table public.chat_messages enable row level security;
+
+-- Conversations: users can CRUD their own
+create policy "Users can read own conversations" on public.chat_conversations for select using (auth.uid() = user_id);
+create policy "Users can insert own conversations" on public.chat_conversations for insert with check (auth.uid() = user_id);
+create policy "Users can update own conversations" on public.chat_conversations for update using (auth.uid() = user_id);
+create policy "Users can delete own conversations" on public.chat_conversations for delete using (auth.uid() = user_id);
+
+-- Messages: users can CRUD messages within their own conversations
+create policy "Users can read own conversation messages" on public.chat_messages for select using (
+  EXISTS (SELECT 1 FROM public.chat_conversations WHERE chat_conversations.id = chat_messages.conversation_id AND chat_conversations.user_id = auth.uid())
+);
+create policy "Users can insert own conversation messages" on public.chat_messages for insert with check (
+  EXISTS (SELECT 1 FROM public.chat_conversations WHERE chat_conversations.id = chat_messages.conversation_id AND chat_conversations.user_id = auth.uid())
+);
+create policy "Users can update own conversation messages" on public.chat_messages for update using (
+  EXISTS (SELECT 1 FROM public.chat_conversations WHERE chat_conversations.id = chat_messages.conversation_id AND chat_conversations.user_id = auth.uid())
+);
+create policy "Users can delete own conversation messages" on public.chat_messages for delete using (
+  EXISTS (SELECT 1 FROM public.chat_conversations WHERE chat_conversations.id = chat_messages.conversation_id AND chat_conversations.user_id = auth.uid())
+);

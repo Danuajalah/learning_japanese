@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { Lesson, UserProgress, DailyGoal, UserProfile, ApiResponse } from '../types'
+import type { Lesson, UserProgress, DailyGoal, UserProfile, ApiResponse, Conversation, ChatMessage } from '../types'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
 
@@ -83,6 +83,112 @@ export class LearningService {
       return res.success
     } catch {
       return false
+    }
+  }
+}
+
+export class SenseiService {
+  static async getConversations(): Promise<Conversation[]> {
+    try {
+      const res = await apiFetch<Conversation[]>('/sensei/conversations')
+      if (!res.success) return []
+      return res.data || []
+    } catch {
+      return []
+    }
+  }
+
+  static async createConversation(): Promise<Conversation | null> {
+    try {
+      const res = await apiFetch<Conversation>('/sensei/conversations', {
+        method: 'POST',
+      })
+      if (!res.success) return null
+      return res.data
+    } catch {
+      return null
+    }
+  }
+
+  static async getConversation(id: string): Promise<{ conversation: Conversation; messages: ChatMessage[] } | null> {
+    try {
+      const res = await apiFetch<{ conversation: Conversation; messages: ChatMessage[] }>(`/sensei/conversations/${id}`)
+      if (!res.success) return null
+      return res.data
+    } catch {
+      return null
+    }
+  }
+
+  static async deleteConversation(id: string): Promise<boolean> {
+    try {
+      const res = await apiFetch(`/sensei/conversations/${id}`, {
+        method: 'DELETE',
+      })
+      return res.success
+    } catch {
+      return false
+    }
+  }
+
+  static async streamMessage(
+    conversationId: string,
+    message: string,
+    onChunk: (content: string, done: boolean) => void,
+    signal?: AbortSignal
+  ): Promise<void> {
+    const { data: { session } } = await supabase.auth.getSession()
+
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`
+    }
+
+    const response = await fetch(`${API_BASE_URL}/sensei/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ message }),
+      signal,
+    })
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => ({}))
+      throw new Error(result.message || 'Failed to send message')
+    }
+
+    const reader = response.body?.getReader()
+    if (!reader) throw new Error('Streaming not supported')
+
+    const decoder = new TextDecoder()
+    let buffer = ''
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+
+        let eventEnd: number
+        while ((eventEnd = buffer.indexOf('\n\n')) !== -1) {
+          const event = buffer.slice(0, eventEnd).trim()
+          buffer = buffer.slice(eventEnd + 2)
+
+          if (!event) continue
+
+          const dataLine = event.split('\n').find((l) => l.startsWith('data: '))
+          if (dataLine) {
+            const jsonStr = dataLine.slice(6).trim()
+            const data = JSON.parse(jsonStr)
+            onChunk(data.content, data.done)
+          }
+        }
+      }
+    } finally {
+      reader.releaseLock()
     }
   }
 }

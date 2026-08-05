@@ -53,13 +53,16 @@ export default function Login() {
 
         {showEmailConfirm && (
           <div className="mb-4 p-3 bg-primary-container/10 border border-primary/30 rounded-lg">
-            <p className="font-body-md text-sm text-primary">
+            <p className="font-body-md text-sm text-primary mb-1">
               Email belum dikonfirmasi. Silakan periksa kotak masuk email Anda (termasuk folder spam) untuk konfirmasi akun.
+            </p>
+            <p className="font-body-md text-xs text-on-surface-variant">
+              Untuk sekarang, gunakan "Masuk dengan Google" di bawah ini.
             </p>
           </div>
         )}
 
-        {error && (
+        {error && !showEmailConfirm && (
           <div className="mb-4 p-3 bg-error-container/10 border border-error/30 rounded-lg">
             <p className="font-body-md text-sm text-error">{error}</p>
           </div>
@@ -69,17 +72,17 @@ export default function Login() {
           <div className="space-y-4">
             <div>
               <label className="block font-label-caps text-label-caps text-on-surface-variant mb-2">
-                EMAIL
+                USERNAME
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">
-                  <span className="material-symbols-outlined text-[20px]">mail</span>
+                  <span className="material-symbols-outlined text-[20px]">person</span>
                 </div>
                 <input
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="nama@email.com"
+                  placeholder="Masukkan email"
                   required
                   className="soft-sunk-input w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-[#E0E0E0] rounded-lg text-on-surface focus:outline-none focus:border-primary focus:ring-0 font-body-md text-body-md placeholder:text-outline-variant"
                 />

@@ -67,6 +67,19 @@ class SupabaseService
             ->delete($this->restUrl . '/' . $table . '?id=eq.' . $id);
     }
 
+    public function deleteWhere(string $table, array $filters, bool $useServiceRole = false): Response
+    {
+        $queryString = http_build_query($filters);
+        $url = $this->restUrl . '/' . $table;
+        if (!empty($queryString)) {
+            $url .= '?' . $queryString;
+        }
+
+        return Http::withHeaders($this->getHeaders($useServiceRole))
+            ->timeout(30)
+            ->delete($url);
+    }
+
     public function rpc(string $function, array $params = [], bool $useServiceRole = false): Response
     {
         return Http::withHeaders($this->getHeaders($useServiceRole))
