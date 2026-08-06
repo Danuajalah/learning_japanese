@@ -122,13 +122,10 @@ PROMPT;
         }
 
         $text = '';
-        foreach ($data as $candidate) {
-            if (!isset($candidate['candidates'])) {
-                continue;
-            }
-            foreach ($candidate['candidates'] as $c) {
-                if (isset($c['content']['parts'])) {
-                    foreach ($c['content']['parts'] as $part) {
+        if (isset($data['candidates'])) {
+            foreach ($data['candidates'] as $candidate) {
+                if (isset($candidate['content']['parts'])) {
+                    foreach ($candidate['content']['parts'] as $part) {
                         if (isset($part['text'])) {
                             $text .= $part['text'];
                         }
