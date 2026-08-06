@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\ProgressController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\SenseiController;
 
 Route::prefix('auth')->group(function () {
@@ -28,6 +29,10 @@ Route::middleware('supabase')->group(function () {
         Route::get('/daily-goal', [ProgressController::class, 'dailyGoal']);
         Route::post('/', [ProgressController::class, 'store']);
         Route::put('/{progress}', [ProgressController::class, 'update']);
+    });
+
+    Route::prefix('profile')->group(function () {
+        Route::put('/', [ProfileController::class, 'update']);
     });
 
     Route::prefix('sensei')->group(function () {

@@ -12,6 +12,11 @@ create extension if not exists "uuid-ossp";
 create table public.profiles (
   id uuid primary key default uuid_generate_v4(),
   display_name text,
+  username text,
+  bio text,
+  birth_date date,
+  gender text,
+  phone text,
   avatar_url text,
   email text,
   level integer default 1,

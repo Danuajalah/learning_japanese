@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+JP:wght@400;500;700&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#d1e4fb",
+                        "on-secondary-fixed": "#400009",
+                        "primary-fixed-dim": "#fbb3c1",
+                        "on-secondary-container": "#fffbff",
+                        "primary-container": "#ffb7c5",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#c9dcf3",
+                        "surface": "#f7f9ff",
+                        "on-tertiary-container": "#485858",
+                        "inverse-primary": "#fbb3c1",
+                        "inverse-on-surface": "#e8f2ff",
+                        "tertiary-fixed": "#d4e6e5",
+                        "on-tertiary-fixed": "#0e1e1e",
+                        "on-surface": "#091d2e",
+                        "on-primary-fixed": "#360c19",
+                        "tertiary-container": "#bccecd",
+                        "on-primary-container": "#7b4551",
+                        "inverse-surface": "#203243",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#ffb3b3",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#d6c2c4",
+                        "on-error": "#ffffff",
+                        "primary": "#864e5a",
+                        "secondary-fixed": "#ffdad9",
+                        "on-tertiary-fixed-variant": "#3a4a49",
+                        "surface-tint": "#864e5a",
+                        "tertiary-fixed-dim": "#b8cac9",
+                        "surface-bright": "#f7f9ff",
+                        "on-surface-variant": "#514345",
+                        "on-secondary-fixed-variant": "#920021",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#df2842",
+                        "error": "#ba1a1a",
+                        "outline": "#837375",
+                        "surface-variant": "#d1e4fb",
+                        "primary-fixed": "#ffd9df",
+                        "surface-container": "#e3efff",
+                        "secondary": "#ba002c",
+                        "tertiary": "#516161",
+                        "surface-container-low": "#edf4ff",
+                        "on-background": "#091d2e",
+                        "on-primary-fixed-variant": "#6b3743",
+                        "surface-container-high": "#d9eaff",
+                        "on-error-container": "#93000a",
+                        "background": "#f7f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "kanji-card": ["Noto Sans JP"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Montserrat"],
+                        "display-jp": ["Noto Sans JP"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        .sakura-gradient {
+            background: linear-gradient(135deg, #f7f9ff 0%, #ffd9df 100%);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #864e5a !important;
+            box-shadow: 0 0 0 2px rgba(134, 78, 90, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface">
+<div class="relative mx-auto flex min-h-screen w-full max-w-[480px] flex-col bg-surface shadow-xl overflow-x-hidden">
+<!-- Minimal Header (Back-to-Main Exception for Focused View) -->
+<header class="flex items-center bg-surface p-4 pb-2 sticky top-0 z-10 border-b border-surface-container">
+<button class="text-on-surface flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-surface-container" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-on-surface text-lg font-bold leading-tight tracking-tight flex-1 ml-2">Edit Profil</h1>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Profile Picture Update -->
+<section class="flex flex-col items-center py-8 px-4 bg-gradient-to-b from-primary-fixed/20 to-transparent">
+<div class="relative group">
+<div class="w-32 h-32 rounded-full border-4 border-white shadow-lg overflow-hidden bg-surface-container-highest">
+<img class="w-full h-full object-cover" data-alt="A portrait of a young professional student with a warm, friendly expression, set against a soft bokeh background of cherry blossom trees in a Japanese park. The lighting is ethereal and soft, emphasizing the Sakura learning brand's gentle and optimistic aesthetic with soft pink and white tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHYiE7Antl793KhVE8xVCTZZJcMuP4KqgKi4e7qMyEF5PzN2gFd048CCudjtY0a8WzfALbpDMVx6-CKuLa9RbGtv9wo9DmY3n3WcPM2cE6HuSFlk1LDgHtK2spMnVCO373iDGVmw7GXFhEqM0iWlbVOTztYjnY6Rv_1-zqILkv_A7UzsiuHFwgYpTQuKWL6chwrXdj9uT9pKFFJC3BlvzhlGVb6guyo-en-l37ivjq-NwB6Ph--pgX"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-secondary p-3 rounded-full text-white shadow-md hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" style="font-size: 20px;">photo_camera</span>
+</button>
+</div>
+<p class="mt-4 text-on-surface text-sm font-semibold tracking-wide">Ubah Foto Profil</p>
+</section>
+<!-- Personal Information Section -->
+<section class="px-5 space-y-6">
+<div>
+<h3 class="text-primary font-bold text-sm uppercase tracking-widest mb-4">Informasi Pribadi</h3>
+<div class="space-y-4">
+<!-- Full Name -->
+<div class="flex flex-col gap-1.5">
+<label class="text-on-surface-variant text-xs font-semibold ml-1">Nama Lengkap</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3.5 text-on-surface focus:ring-primary" type="text" value="Hana Sakura"/>
+</div>
+<!-- Username -->
+<div class="flex flex-col gap-1.5 opacity-80">
+<label class="text-on-surface-variant text-xs font-semibold ml-1">Username (Tidak dapat diubah)</label>
+<div class="w-full bg-surface-container border border-outline-variant rounded-xl px-4 py-3.5 text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span>hanasakura_edu</span>
+</div>
+</div>
+<!-- Bio -->
+<div class="flex flex-col gap-1.5">
+<label class="text-on-surface-variant text-xs font-semibold ml-1">Bio</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-on-surface focus:ring-primary resize-none" placeholder="Ceritakan sedikit tentang dirimu..." rows="3">Belajar Bahasa Jepang dengan semangat sakura! 🌸</textarea>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Birth Date -->
+<div class="flex flex-col gap-1.5">
+<label class="text-on-surface-variant text-xs font-semibold ml-1">Tanggal Lahir</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3.5 text-on-surface focus:ring-primary" type="date" value="2000-04-12"/>
+</div>
+</div>
+<!-- Gender -->
+<div class="flex flex-col gap-1.5">
+<label class="text-on-surface-variant text-xs font-semibold ml-1">Jenis Kelamin</label>
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3.5 text-on-surface focus:ring-primary appearance-none">
+<option selected="" value="perempuan">Perempuan</option>
+<option value="laki-laki">Laki-laki</option>
+<option value="lainnya">Lainnya</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<hr class="border-surface-container"/>
+<!-- Account Settings -->
+<div>
+<h3 class="text-primary font-bold text-sm uppercase tracking-widest mb-4">Pengaturan Akun</h3>
+<div class="space-y-4">
+<!-- Email -->
+<div class="flex flex-col gap-1.5">
+<label class="text-on-surface-variant text-xs font-semibold ml-1">Email</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" style="font-size: 20px;">mail</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-xl pl-12 pr-4 py-3.5 text-on-surface focus:ring-primary" type="email" value="hana.sakura@komorebi.com"/>
+</div>
+</div>
+<!-- Phone -->
+<div class="flex flex-col gap-1.5">
+<label class="text-on-surface-variant text-xs font-semibold ml-1">Nomor Telepon</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-4 text-outline" style="font-size: 20px;">call</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-xl pl-12 pr-4 py-3.5 text-on-surface focus:ring-primary" type="tel" value="+62 812 3456 7890"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Privacy Policy Note -->
+<p class="text-[10px] text-outline text-center px-4 leading-relaxed mt-4">
+                    Data pribadi Anda dilindungi sesuai dengan kebijakan privasi Komorebi Learning. Kami tidak akan pernah membagikan data Anda tanpa izin.
+                </p>
+</section>
+</main>
+<!-- Save Button Footer -->
+<footer class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] p-4 bg-surface border-t border-surface-container">
+<button class="w-full bg-secondary hover:bg-on-secondary-fixed-variant text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-weight="fill">save</span>
+<span>Simpan Perubahan</span>
+</button>
+</footer>
+</div>
+<script>
+        // Simple micro-interaction for the save button
+        document.querySelector('footer button').addEventListener('click', function() {
+            const originalContent = this.innerHTML;
+            this.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> <span>Menyimpan...</span>';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                this.innerHTML = '<span class="material-symbols-outlined">check_circle</span> <span>Berhasil Disimpan!</span>';
+                this.classList.replace('bg-secondary', 'bg-green-600');
+                
+                setTimeout(() => {
+                    this.innerHTML = originalContent;
+                    this.classList.replace('bg-green-600', 'bg-secondary');
+                    this.disabled = false;
+                }, 2000);
+            }, 1500);
+        });
+
+        // Add visual feedback to inputs
+        document.querySelectorAll('input, textarea, select').forEach(el => {
+            el.addEventListener('focus', () => {
+                el.parentElement.querySelector('label')?.classList.add('text-primary');
+            });
+            el.addEventListener('blur', () => {
+                el.parentElement.querySelector('label')?.classList.remove('text-primary');
+            });
+        });
+    </script>
+</body></html>

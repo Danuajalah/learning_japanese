@@ -85,6 +85,19 @@ export class LearningService {
       return false
     }
   }
+
+  static async updateProfile(data: Partial<UserProfile>): Promise<UserProfile | null> {
+    try {
+      const res = await apiFetch<UserProfile>('/profile', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      })
+      if (!res.success) return null
+      return res.data
+    } catch {
+      return null
+    }
+  }
 }
 
 export class SenseiService {

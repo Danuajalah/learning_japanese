@@ -5,6 +5,11 @@ export interface Database {
         Row: {
           id: string
           display_name: string | null
+          username: string | null
+          bio: string | null
+          birth_date: string | null
+          gender: string | null
+          phone: string | null
           avatar_url: string | null
           email: string | null
           level: number | null
@@ -15,6 +20,11 @@ export interface Database {
         Insert: {
           id: string
           display_name?: string | null
+          username?: string | null
+          bio?: string | null
+          birth_date?: string | null
+          gender?: string | null
+          phone?: string | null
           avatar_url?: string | null
           email?: string | null
           level?: number | null
@@ -22,6 +32,11 @@ export interface Database {
         }
         Update: {
           display_name?: string | null
+          username?: string | null
+          bio?: string | null
+          birth_date?: string | null
+          gender?: string | null
+          phone?: string | null
           avatar_url?: string | null
           level?: number | null
           xp?: number | null

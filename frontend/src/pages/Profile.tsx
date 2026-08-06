@@ -155,7 +155,7 @@ export default function Profile() {
               <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-2 shadow-sm">
                 <ul className="flex flex-col">
                   <li>
-                    <button className="w-full flex items-center justify-between p-4 rounded-lg hover:bg-surface-container transition-colors group text-left squishy-btn">
+                    <button onClick={() => navigate('/profile/edit')} className="w-full flex items-center justify-between p-4 rounded-lg hover:bg-surface-container transition-colors group text-left squishy-btn">
                       <div className="flex items-center gap-3 text-on-surface">
                         <span className="material-symbols-outlined text-outline" style={{ fontVariationSettings: "'FILL' 0" }}>
                           person_outline

@@ -4,6 +4,7 @@ import Dashboard from '@/pages/Dashboard'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import Profile from '@/pages/Profile'
+import EditProfile from '@/pages/EditProfile'
 import Practice from '@/pages/Practice'
 import Sensei from '@/pages/Sensei'
 import { Auth } from '@/services/api'
@@ -66,6 +67,7 @@ export default function App() {
       <Route path="/practice" element={isAuthenticated ? <Practice /> : <Navigate to="/login" replace />} />
       <Route path="/sensei" element={isAuthenticated ? <Sensei /> : <Navigate to="/login" replace />} />
       <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />} />
+      <Route path="/profile/edit" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" replace />} />
     </Routes>
   )
 }

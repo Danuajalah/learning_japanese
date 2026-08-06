@@ -32,6 +32,11 @@ export interface DailyGoal {
 export interface UserProfile {
   id: string
   display_name: string
+  username: string | null
+  bio: string | null
+  birth_date: string | null
+  gender: string | null
+  phone: string | null
   avatar_url: string | null
   email: string
   level: number
