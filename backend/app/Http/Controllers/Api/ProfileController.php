@@ -28,15 +28,23 @@ class ProfileController extends Controller
             ], 503);
         }
 
-        $validated = $request->validate([
-            'display_name' => 'nullable|string|max:255',
-            'username' => 'nullable|string|max:50|unique:profiles,username,' . $userId,
-            'bio' => 'nullable|string|max:500',
-            'birth_date' => 'nullable|date',
-            'gender' => 'nullable|in:perempuan,laki-lain,lainnya',
-            'phone' => 'nullable|string|max:20',
-            'avatar_url' => 'nullable|url|max:500',
-        ]);
+        try {
+            $validated = $request->validate([
+                'display_name' => 'nullable|string|max:255',
+                'username' => 'nullable|string|max:50|unique:profiles,username,' . $userId,
+                'bio' => 'nullable|string|max:500',
+                'birth_date' => 'nullable|date',
+                'gender' => 'nullable|in:perempuan,laki-laki,lainnya',
+                'phone' => 'nullable|string|max:20',
+                'avatar_url' => 'nullable|url|max:500',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
         $data = array_filter($validated, fn($v) => $v !== null);
 
@@ -50,11 +58,12 @@ class ProfileController extends Controller
             ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update profile',
+                'message' => 'Failed to update profile on server',
             ], 500);
         }
 
-        $profile = $response->json()[0] ?? $response->json();
+        $updated = $response->json();
+        $profile = is_array($updated) && isset($updated[0]) ? $updated[0] : $updated;
 
         return response()->json([
             'success' => true,

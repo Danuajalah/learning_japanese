@@ -81,7 +81,7 @@ export default function EditProfile() {
     <>
       <TopAppBar />
       <DesktopNav active="profile" />
-      <div className="font-body-md min-h-screen pb-24 md:pb-0 pt-16 md:pt-20">
+      <div className="font-body-md min-h-screen pb-28 md:pb-0 pt-16 md:pt-20">
         <div className="mx-auto w-full max-w-[480px]">
           {/* Header */}
           <header className="flex items-center bg-surface p-4 pb-2 sticky top-0 z-10 border-b border-surface-container">
@@ -96,7 +96,7 @@ export default function EditProfile() {
             </h1>
           </header>
 
-          <main className="flex-1 overflow-y-auto pb-24">
+          <main className="flex-1 overflow-y-auto pb-28">
             {/* Profile Picture */}
             <section className="flex flex-col items-center py-8 px-4 bg-gradient-to-b from-primary-fixed/20 to-transparent">
               <div className="relative group">
@@ -161,7 +161,7 @@ export default function EditProfile() {
                       value={bio}
                       onChange={(e) => setBio(e.target.value)}
                       placeholder="Ceritakan sedikit tentang dirimu..."
-                      rows="3"
+                      rows={3}
                       className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-on-surface focus:ring-primary resize-none"
                     />
                   </div>
