@@ -48,6 +48,12 @@ export interface Database {
           title: string
           subtitle: string | null
           description: string | null
+          content: string | null
+          questions: string | null
+          difficulty: string | null
+          content_type: string | null
+          passing_score: number | null
+          unlock_requirement: string | null
           unit_number: number
           status: string
           xp_reward: number
@@ -61,6 +67,12 @@ export interface Database {
           title: string
           subtitle?: string | null
           description?: string | null
+          content?: string | null
+          questions?: string | null
+          difficulty?: string | null
+          content_type?: string | null
+          passing_score?: number | null
+          unlock_requirement?: string | null
           unit_number: number
           status: string
           xp_reward: number
@@ -72,6 +84,12 @@ export interface Database {
           title?: string
           subtitle?: string | null
           description?: string | null
+          content?: string | null
+          questions?: string | null
+          difficulty?: string | null
+          content_type?: string | null
+          passing_score?: number | null
+          unlock_requirement?: string | null
           status?: string
           xp_reward?: number
           estimated_minutes?: number

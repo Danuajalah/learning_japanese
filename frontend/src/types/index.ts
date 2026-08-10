@@ -1,11 +1,25 @@
 export type LessonStatus = 'locked' | 'in_progress' | 'completed'
 
+export interface LessonQuestion {
+  id: string
+  type: 'multiple_choice' | 'fill_blank' | 'true_false'
+  question: string
+  options?: string[]
+  correct_answer: string
+  explanation?: string
+}
+
 export interface Lesson {
   id: string
   unit_number: number
   title: string
   subtitle: string
   description: string
+  content?: string
+  questions: LessonQuestion[]
+  difficulty: string
+  content_type: string
+  passing_score: number
   status: LessonStatus
   progress: number
   xp_reward: number

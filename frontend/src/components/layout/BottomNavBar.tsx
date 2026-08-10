@@ -9,51 +9,21 @@ export default function BottomNavBar({ active = 'map' }: { active?: string }) {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-surface/80 dark:bg-surface-container/80 backdrop-blur-md rounded-t-xl shadow-lg border-t-0 md:hidden">
+    <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 pb-safe pt-1 bg-surface/80 dark:bg-surface-container/80 backdrop-blur-md rounded-t-xl shadow-lg border-t-0 md:hidden">
       {navItems.map((item) => {
         const isActive = item.id === active
-        const isFab = item.id === 'sensei'
-
-        if (isFab) {
-          return (
-            <Link
-              key={item.id}
-              to={item.path}
-              className="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim hover:scale-110 hover:-translate-y-1 active:scale-90 transition-all duration-150"
-            >
-              <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-on-primary shadow-lg border-4 border-surface-container-lowest">
-                <span
-                  className="material-symbols-outlined text-3xl"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  {item.icon}
-                </span>
-              </div>
-              <span className="font-label-caps text-label-caps mt-1">{item.label}</span>
-            </Link>
-          )
-        }
-
-        if (isActive) {
-          return (
-            <Link
-              key={item.id}
-              to={item.path}
-              className="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed-variant text-on-primary-container dark:text-on-primary-fixed-variant rounded-full px-4 py-1 hover:scale-110 hover:-translate-y-1 active:scale-90 transition-all duration-150"
-            >
-              <span className="material-symbols-outlined text-2xl mb-1">{item.icon}</span>
-              <span className="font-label-caps text-label-caps">{item.label}</span>
-            </Link>
-          )
-        }
 
         return (
           <Link
             key={item.id}
             to={item.path}
-            className="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-2 hover:text-secondary dark:hover:text-secondary-fixed-dim hover:scale-110 hover:-translate-y-1 active:scale-90 transition-all duration-150"
+            className={`flex flex-col items-center justify-center rounded-full px-3 py-1.5 transition-all duration-150 active:scale-90 ${
+              isActive
+                ? 'bg-primary-container text-on-primary-container'
+                : 'text-on-surface-variant hover:bg-primary-container/50 hover:text-primary'
+            }`}
           >
-            <span className="material-symbols-outlined text-2xl mb-1">{item.icon}</span>
+            <span className="material-symbols-outlined text-2xl">{item.icon}</span>
             <span className="font-label-caps text-label-caps">{item.label}</span>
           </Link>
         )

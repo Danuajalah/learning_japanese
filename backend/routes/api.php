@@ -22,6 +22,7 @@ Route::middleware('supabase')->group(function () {
         Route::get('/', [LessonController::class, 'index']);
         Route::get('/{lesson}', [LessonController::class, 'show']);
         Route::post('/{lesson}/complete', [LessonController::class, 'complete']);
+        Route::post('/{lesson}/submit-answer', [LessonController::class, 'submitAnswer']);
     });
 
     Route::prefix('progress')->group(function () {

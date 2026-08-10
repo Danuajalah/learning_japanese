@@ -5,6 +5,7 @@ interface LessonNodeProps {
   lesson: Lesson
   marginLeft?: string
   marginRight?: string
+  onClick?: () => void
 }
 
 const statusConfig = {
@@ -31,7 +32,7 @@ const statusConfig = {
   },
 }
 
-export default function LessonNode({ lesson, marginLeft, marginRight }: LessonNodeProps) {
+export default function LessonNode({ lesson, marginLeft, marginRight, onClick }: LessonNodeProps) {
   const cfg = statusConfig[lesson.status as keyof typeof statusConfig]
   const isLocked = lesson.status === 'locked'
 
@@ -41,7 +42,7 @@ export default function LessonNode({ lesson, marginLeft, marginRight }: LessonNo
       isLocked && 'opacity-50',
       marginLeft,
       marginRight,
-    )}>
+    )} onClick={() => !isLocked && onClick && onClick()}>
       {lesson.status === 'in_progress' && (
         <div className="absolute w-24 h-24 bg-primary-container rounded-full animate-ping opacity-50 z-0"></div>
       )}

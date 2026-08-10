@@ -7,6 +7,7 @@ import Profile from '@/pages/Profile'
 import EditProfile from '@/pages/EditProfile'
 import Practice from '@/pages/Practice'
 import Sensei from '@/pages/Sensei'
+import LessonDetail from '@/pages/LessonDetail'
 import { Auth } from '@/services/api'
 
 function AuthCallback() {
@@ -68,6 +69,7 @@ export default function App() {
       <Route path="/sensei" element={isAuthenticated ? <Sensei /> : <Navigate to="/login" replace />} />
       <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />} />
       <Route path="/profile/edit" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" replace />} />
+      <Route path="/lesson/:id" element={isAuthenticated ? <LessonDetail /> : <Navigate to="/login" replace />} />
     </Routes>
   )
 }

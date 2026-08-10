@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('lessons', function (Blueprint $table) {
+            $table->text('content')->nullable()->after('description');
+            $table->json('questions')->nullable()->after('content');
+            $table->string('difficulty')->nullable()->after('questions');
+            $table->string('content_type')->nullable()->after('difficulty');
+            $table->string('passing_score')->nullable()->after('content_type');
+            $table->string('unlock_requirement')->nullable()->after('passing_score');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('lessons', function (Blueprint $table) {
+            $table->dropColumn(['content', 'questions', 'difficulty', 'content_type', 'passing_score', 'unlock_requirement']);
+        });
+    }
+};

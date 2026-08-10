@@ -108,7 +108,7 @@ export default function Profile() {
       <>
         <TopAppBar />
         <DesktopNav active="profile" />
-        <div className="pt-20 max-w-7xl mx-auto px-container-margin pb-24 text-center text-on-surface-variant">
+        <div className="pt-20 max-w-7xl mx-auto px-container-margin pb-16 text-center text-on-surface-variant">
           Loading profile...
         </div>
         <BottomNavBar active="profile" />
@@ -120,7 +120,7 @@ export default function Profile() {
     <>
       <TopAppBar />
       <DesktopNav active="profile" />
-      <main className="bg-background text-on-surface font-body-md min-h-screen pb-24 md:pb-0 pt-16 md:pt-20">
+      <main className="bg-background text-on-surface font-body-md min-h-screen pb-16 md:pb-0 pt-16 md:pt-20">
         <div className="max-w-[1140px] mx-auto px-container-margin md:px-8 pb-12">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mt-8">
             <div className="md:col-span-4 flex flex-col gap-6">

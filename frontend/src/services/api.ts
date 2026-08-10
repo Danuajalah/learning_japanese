@@ -54,6 +54,16 @@ export class LearningService {
     }
   }
 
+  static async getLesson(id: string): Promise<Lesson | null> {
+    try {
+      const res = await apiFetch<Lesson>(`/lessons/${id}`)
+      if (!res.success) return null
+      return res.data
+    } catch {
+      return null
+    }
+  }
+
   static async getDailyGoal(): Promise<DailyGoal> {
     try {
       const res = await apiFetch<DailyGoal>('/progress/daily-goal')
@@ -83,6 +93,37 @@ export class LearningService {
       return res.success
     } catch {
       return false
+    }
+  }
+
+  static async submitAnswer(lessonId: string, answer: string): Promise<{
+    success: boolean
+    correct: boolean
+    score: number
+    correct_count: number
+    total_questions: number
+    xp_earned: number
+    passed: boolean
+    message: string
+  } | null> {
+    try {
+      const res = await apiFetch<{
+        success: boolean
+        correct: boolean
+        score: number
+        correct_count: number
+        total_questions: number
+        xp_earned: number
+        passed: boolean
+        message: string
+      }>(`/lessons/${lessonId}/submit-answer`, {
+        method: 'POST',
+        body: JSON.stringify({ answer }),
+      })
+      if (!res.success) return null
+      return res.data
+    } catch {
+      return null
     }
   }
 

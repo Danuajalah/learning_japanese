@@ -42,7 +42,7 @@ export default function Practice() {
       <>
         <TopAppBar />
         <DesktopNav active="practice" />
-        <div className="pt-20 max-w-4xl mx-auto px-container-margin pb-24 text-center text-on-surface-variant">
+        <div className="pt-20 max-w-4xl mx-auto px-container-margin pb-16 text-center text-on-surface-variant">
           Loading practice sessions...
         </div>
         <BottomNavBar active="practice" />
@@ -61,7 +61,7 @@ export default function Practice() {
     <>
       <TopAppBar />
       <DesktopNav active="practice" />
-      <main className="pt-20 pb-24 max-w-4xl mx-auto px-container-margin bg-sakura-pattern min-h-screen">
+      <main className="pt-20 pb-16 max-w-4xl mx-auto px-container-margin bg-sakura-pattern min-h-screen">
         <div className="flex justify-between items-center mb-6">
           <h1 className="font-headline-lg text-headline-lg font-bold text-on-surface">
             Practice
