@@ -18,6 +18,7 @@ export default function LessonDetail() {
   const [selectedAnswer, setSelectedAnswer] = useState('')
   const [answerState, setAnswerState] = useState<AnswerState>('idle')
   const [results, setResults] = useState<Array<{ correct: boolean; explanation?: string }>>([])
+  const [currentExplanation, setCurrentExplanation] = useState<string>('')
   const [isLocked, setIsLocked] = useState(false)
   const [result, setResult] = useState<{
     correct: boolean
@@ -73,12 +74,14 @@ export default function LessonDetail() {
       const newResult = { correct: res.correct, explanation: res.explanation }
       const newResults = [...results, newResult]
       setResults(newResults)
+      setCurrentExplanation(res.explanation || '')
       setAnswerState(res.correct ? 'correct' : 'wrong')
 
       if (questionIndex < lesson.questions.length - 1) {
         setQuestionIndex(prev => prev + 1)
         setSelectedAnswer('')
         setAnswerState('idle')
+        setCurrentExplanation('')
       } else {
         const correctCount = newResults.filter(r => r.correct).length
         const total = lesson.questions.length
@@ -355,7 +358,7 @@ export default function LessonDetail() {
                   )}
                 </div>
 
-                {(answerState === 'correct' || answerState === 'wrong') && results[questionIndex]?.explanation && (
+                {(answerState === 'correct' || answerState === 'wrong') && currentExplanation && (
                   <div className={`rounded-xl border p-4 shadow-sm animate-pulse ${
                     answerState === 'correct' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
                   }`}>
@@ -364,7 +367,7 @@ export default function LessonDetail() {
                       <p className={`text-sm ${
                         answerState === 'correct' ? 'text-green-700' : 'text-red-700'
                       }`}>
-                        {results[questionIndex].explanation}
+                        {currentExplanation}
                       </p>
                     </div>
                   </div>

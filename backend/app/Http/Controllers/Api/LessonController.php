@@ -123,6 +123,13 @@ class LessonController extends Controller
                 ], 404);
             }
 
+            if (!$userId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated',
+                ], 401);
+            }
+
             \DB::table('user_progress')->updateOrInsert(
                 ['user_id' => $userId, 'lesson_id' => $lessonId],
                 [
@@ -141,9 +148,14 @@ class LessonController extends Controller
                 'message' => 'Lesson completed successfully',
             ]);
         } catch (\Exception $e) {
+            \Log::error('Complete lesson failed', [
+                'user_id' => $userId,
+                'lesson_id' => $lessonId,
+                'error' => $e->getMessage(),
+            ]);
             return response()->json([
                 'success' => false,
-                'message' => 'Database unavailable',
+                'message' => 'Database unavailable: ' . $e->getMessage(),
             ], 500);
         }
     }
