@@ -10,7 +10,7 @@ interface LessonNodeProps {
 
 const statusConfig = {
   completed: {
-    circle: 'w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg border-4 border-surface-container-lowest z-10 hover:scale-105 transition-transform',
+    circle: 'w-20 h-20 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg border-4 border-surface-container-lowest z-10 active:scale-95 transition-transform',
     icon: 'star',
     iconSize: 'text-4xl',
     card: 'mt-3 bg-surface-container-lowest px-4 py-2 rounded-xl shadow-sm border border-surface-variant text-center',
@@ -38,8 +38,8 @@ export default function LessonNode({ lesson, marginLeft, marginRight, onClick }:
 
   return (
     <div className={cx(
-      'flex flex-col items-center group cursor-pointer squish',
-      isLocked && 'opacity-50',
+      'flex flex-col items-center',
+      isLocked ? 'opacity-50' : 'cursor-pointer squish',
       marginLeft,
       marginRight,
     )} onClick={() => !isLocked && onClick && onClick()}>

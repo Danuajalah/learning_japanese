@@ -22,7 +22,7 @@ class LessonController extends Controller
         $userId = $request->attributes->get('supabase_user_id');
 
         try {
-            $lessons = Lesson::orderBy('order_index', 'asc')->get();
+            $lessons = Lesson::orderBy('unit_number', 'asc')->get();
 
             if ($userId) {
                 $progressMap = [];
@@ -34,6 +34,16 @@ class LessonController extends Controller
                     if (isset($progressMap[$lesson->id])) {
                         $lesson->status = 'completed';
                         $lesson->progress = 100;
+                    } else {
+                        $prevLesson = Lesson::where('unit_number', '<', $lesson->unit_number)->orderBy('unit_number', 'desc')->first();
+                        if ($prevLesson && isset($progressMap[$prevLesson->id])) {
+                            $lesson->status = 'in_progress';
+                        } elseif (!$prevLesson) {
+                            $lesson->status = 'in_progress';
+                        } else {
+                            $lesson->status = 'locked';
+                        }
+                        $lesson->progress = 0;
                     }
                 }
             }

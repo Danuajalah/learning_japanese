@@ -5,6 +5,7 @@ import { LearningService } from '@/services/api'
 import type { Lesson } from '@/types'
 
 type Step = 'content' | 'quiz' | 'result'
+type AnswerState = 'idle' | 'correct' | 'wrong'
 
 export default function LessonDetail() {
   const { id } = useParams<{ id: string }>()
@@ -13,7 +14,11 @@ export default function LessonDetail() {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [step, setStep] = useState<Step>('content')
+  const [questionIndex, setQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState('')
+  const [answerState, setAnswerState] = useState<AnswerState>('idle')
+  const [results, setResults] = useState<Array<{ correct: boolean; explanation?: string }>>([])
+  const [isLocked, setIsLocked] = useState(false)
   const [result, setResult] = useState<{
     correct: boolean
     score: number
@@ -23,8 +28,6 @@ export default function LessonDetail() {
     passed: boolean
     message: string
   } | null>(null)
-
-  const [isLocked, setIsLocked] = useState(false)
 
   const loadLesson = useCallback(async () => {
     if (!id) return
@@ -50,31 +53,55 @@ export default function LessonDetail() {
   const handleStartQuiz = () => {
     if (!lesson) return
     if (lesson.questions.length === 0) {
-      setResult({
-        correct: true,
-        score: 100,
-        correct_count: 0,
-        total_questions: 0,
-        xp_earned: lesson.xp_reward,
-        passed: true,
-        message: 'Unit ini tidak memiliki soal. Unit dilengkapi!',
-      })
+      setResults([{ correct: true, explanation: 'Unit ini tidak memiliki soal. Unit dilengkapi!' }])
       setStep('result')
       return
     }
     setStep('quiz')
+    setQuestionIndex(0)
     setSelectedAnswer('')
-    setResult(null)
+    setAnswerState('idle')
+    setResults([])
   }
 
   const handleSubmitAnswer = async () => {
     if (!lesson || !selectedAnswer || submitting) return
     setSubmitting(true)
 
-    const res = await LearningService.submitAnswer(lesson.id, selectedAnswer)
+    const res = await LearningService.submitAnswer(lesson.id, questionIndex, selectedAnswer)
     if (res) {
-      setResult(res)
-      setStep('result')
+      const newResult = { correct: res.correct, explanation: res.explanation }
+      const newResults = [...results, newResult]
+      setResults(newResults)
+      setAnswerState(res.correct ? 'correct' : 'wrong')
+
+      if (questionIndex < lesson.questions.length - 1) {
+        setQuestionIndex(prev => prev + 1)
+        setSelectedAnswer('')
+        setAnswerState('idle')
+      } else {
+        const correctCount = newResults.filter(r => r.correct).length
+        const total = lesson.questions.length
+        const score = total > 0 ? Math.round((correctCount / total) * 100) : 0
+        const passed = score >= (lesson.passing_score || 70)
+
+        if (passed) {
+          LearningService.updateLessonProgress(lesson.id, lesson.xp_reward)
+        }
+
+        setResult({
+          correct: correctCount === total,
+          score,
+          correct_count: correctCount,
+          total_questions: total,
+          xp_earned: passed ? lesson.xp_reward : 0,
+          passed,
+          message: passed
+            ? 'Bagus! Anda lulus dengan skor ' + score + '%'
+            : 'Skor Anda: ' + score + '%. Butuh ' + (lesson.passing_score || 70) + '% untuk lulus.',
+        })
+        setStep('result')
+      }
     }
     setSubmitting(false)
   }
@@ -82,10 +109,10 @@ export default function LessonDetail() {
   const handleComplete = async () => {
     if (!lesson) return
     await LearningService.updateLessonProgress(lesson.id, lesson.xp_reward)
-    navigate('/')
+    window.location.href = '/'
   }
 
-  const currentQuestion = lesson?.questions?.[0]
+  const currentQuestion = lesson?.questions?.[questionIndex]
 
   if (loading) {
     return (
@@ -117,6 +144,26 @@ export default function LessonDetail() {
     beginner: 'bg-green-100 text-green-700',
     intermediate: 'bg-yellow-100 text-yellow-700',
     advanced: 'bg-red-100 text-red-700',
+  }
+
+  const answerButtonClass = (opt: string) => {
+    const base = 'w-full text-left px-4 py-3 rounded-xl border transition-all squishy-btn flex items-center gap-3 '
+    if (answerState === 'idle') {
+      return base + (selectedAnswer === opt ? 'border-primary bg-primary-container/20' : 'border-outline-variant hover:border-primary')
+    }
+    const isSelected = selectedAnswer === opt
+    if (answerState === 'correct') {
+      return base + 'border-green-500 bg-green-50'
+    }
+    if (answerState === 'wrong') {
+      if (isSelected) return base + 'border-red-500 bg-red-50'
+      const currentQ = lesson.questions[questionIndex]
+      if (currentQ && opt === currentQ.correct_answer) {
+        return base + 'border-green-500 bg-green-50'
+      }
+      return base + 'border-outline-variant opacity-50'
+    }
+    return base
   }
 
   return (
@@ -216,10 +263,29 @@ export default function LessonDetail() {
 
             {step === 'quiz' && currentQuestion && (
               <div className="space-y-6">
-                <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-5 shadow-sm">
-                  <h2 className="font-label-caps text-label-caps text-outline uppercase tracking-wider mb-4">
-                    Soal {1} / {lesson.questions.length}
+                <div className="flex items-center justify-between">
+                  <h2 className="font-label-caps text-label-caps text-outline uppercase tracking-wider">
+                    Soal {questionIndex + 1} / {lesson.questions.length}
                   </h2>
+                  <div className="flex gap-1">
+                    {lesson.questions.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`w-2.5 h-2.5 rounded-full transition-all ${
+                          idx < questionIndex
+                            ? 'bg-green-500'
+                            : idx === questionIndex
+                            ? 'bg-primary scale-125'
+                            : 'bg-surface-variant'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className={`bg-surface-container-lowest rounded-xl border p-5 shadow-sm transition-colors ${
+                  answerState === 'correct' ? 'border-green-500 bg-green-50' : answerState === 'wrong' ? 'border-red-500 bg-red-50' : 'border-outline-variant'
+                }`}>
                   <p className="text-on-surface text-base font-medium mb-6">
                     {currentQuestion.question}
                   </p>
@@ -229,17 +295,24 @@ export default function LessonDetail() {
                       {currentQuestion.options.map((opt, idx) => (
                         <button
                           key={idx}
-                          onClick={() => setSelectedAnswer(opt)}
-                          className={`w-full text-left px-4 py-3 rounded-xl border transition-all squishy-btn ${
-                            selectedAnswer === opt
-                              ? 'border-primary bg-primary-container/20'
-                              : 'border-outline-variant hover:border-primary'
-                          }`}
+                          onClick={() => !answerState || answerState === 'idle' ? setSelectedAnswer(opt) : null}
+                          className={answerButtonClass(opt)}
+                          disabled={!!answerState && answerState !== 'idle'}
                         >
-                          <span className="font-label-caps text-label-caps text-primary mr-2">
+                          <span className={`font-label-caps text-label-caps mr-2 ${
+                            answerState === 'correct' && selectedAnswer === opt ? 'text-green-600' :
+                            answerState === 'wrong' && selectedAnswer === opt ? 'text-red-600' :
+                            'text-primary'
+                          }`}>
                             {String.fromCharCode(65 + idx)}
                           </span>
                           <span className="text-on-surface text-sm">{opt}</span>
+                          {answerState === 'correct' && selectedAnswer === opt && (
+                            <span className="material-symbols-outlined text-green-600 ml-auto">check_circle</span>
+                          )}
+                          {answerState === 'wrong' && selectedAnswer === opt && (
+                            <span className="material-symbols-outlined text-red-600 ml-auto">cancel</span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -250,14 +323,19 @@ export default function LessonDetail() {
                       {['Benar', 'Salah'].map((opt) => (
                         <button
                           key={opt}
-                          onClick={() => setSelectedAnswer(opt)}
-                          className={`flex-1 py-3 rounded-xl border transition-all squishy-btn ${
-                            selectedAnswer === opt
-                              ? 'border-primary bg-primary-container/20'
-                              : 'border-outline-variant hover:border-primary'
+                          onClick={() => !answerState || answerState === 'idle' ? setSelectedAnswer(opt) : null}
+                          className={`flex-1 py-3 rounded-xl border transition-all squishy-btn flex items-center justify-center gap-2 ${
+                            answerButtonClass(opt).replace('w-full text-left ', '')
                           }`}
+                          disabled={!!answerState && answerState !== 'idle'}
                         >
                           <span className="text-on-surface text-sm font-medium">{opt}</span>
+                          {answerState === 'correct' && selectedAnswer === opt && (
+                            <span className="material-symbols-outlined text-green-600">check_circle</span>
+                          )}
+                          {answerState === 'wrong' && selectedAnswer === opt && (
+                            <span className="material-symbols-outlined text-red-600">cancel</span>
+                          )}
                         </button>
                       ))}
                     </div>
@@ -267,22 +345,56 @@ export default function LessonDetail() {
                     <input
                       type="text"
                       value={selectedAnswer}
-                      onChange={(e) => setSelectedAnswer(e.target.value)}
+                      onChange={(e) => !answerState || answerState === 'idle' ? setSelectedAnswer(e.target.value) : null}
                       placeholder="Ketik jawaban Anda..."
-                      className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-on-surface focus:ring-primary"
+                      disabled={!!answerState && answerState !== 'idle'}
+                      className={`w-full bg-surface-container-low border rounded-xl px-4 py-3 text-on-surface focus:ring-primary ${
+                        answerState === 'correct' ? 'border-green-500 bg-green-50' : answerState === 'wrong' ? 'border-red-500 bg-red-50' : 'border-outline-variant'
+                      }`}
                     />
                   )}
                 </div>
 
+                {(answerState === 'correct' || answerState === 'wrong') && results[questionIndex]?.explanation && (
+                  <div className={`rounded-xl border p-4 shadow-sm animate-pulse ${
+                    answerState === 'correct' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+                  }`}>
+                    <div className="flex items-start gap-2">
+                      <span className="material-symbols-outlined text-lg mt-0.5 text-primary">lightbulb</span>
+                      <p className={`text-sm ${
+                        answerState === 'correct' ? 'text-green-700' : 'text-red-700'
+                      }`}>
+                        {results[questionIndex].explanation}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <button
                   onClick={handleSubmitAnswer}
                   disabled={!selectedAnswer || submitting}
-                  className="w-full bg-secondary text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform squishy-btn disabled:opacity-50 flex items-center justify-center gap-2"
+                  className={`w-full font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all squishy-btn flex items-center justify-center gap-2 ${
+                    answerState === 'correct'
+                      ? 'bg-green-600 text-white'
+                      : answerState === 'wrong'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-secondary text-white'
+                  } disabled:opacity-50`}
                 >
                   {submitting ? (
                     <>
                       <span className="material-symbols-outlined animate-spin">sync</span>
                       <span>Memeriksa...</span>
+                    </>
+                  ) : answerState === 'correct' ? (
+                    <>
+                      <span className="material-symbols-outlined">check_circle</span>
+                      <span>{questionIndex < lesson.questions.length - 1 ? 'Lanjut ke Soal Berikutnya' : 'Lihat Hasil'}</span>
+                    </>
+                  ) : answerState === 'wrong' ? (
+                    <>
+                      <span className="material-symbols-outlined">cancel</span>
+                      <span>{questionIndex < lesson.questions.length - 1 ? 'Lanjut ke Soal Berikutnya' : 'Lihat Hasil'}</span>
                     </>
                   ) : (
                     <>
@@ -348,8 +460,10 @@ export default function LessonDetail() {
                   <button
                     onClick={() => {
                       setStep('quiz')
+                      setQuestionIndex(0)
                       setSelectedAnswer('')
-                      setResult(null)
+                      setAnswerState('idle')
+                      setResults([])
                     }}
                     className="w-full bg-primary text-on-primary font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform squishy-btn flex items-center justify-center gap-2"
                   >

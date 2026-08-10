@@ -109,29 +109,21 @@ export class LearningService {
     }
   }
 
-  static async submitAnswer(lessonId: string, answer: string): Promise<{
+  static async submitAnswer(lessonId: string, questionIndex: number, answer: string): Promise<{
     success: boolean
     correct: boolean
-    score: number
-    correct_count: number
+    explanation?: string
     total_questions: number
-    xp_earned: number
-    passed: boolean
-    message: string
   } | null> {
     try {
       const res = await apiFetch<{
         success: boolean
         correct: boolean
-        score: number
-        correct_count: number
+        explanation?: string
         total_questions: number
-        xp_earned: number
-        passed: boolean
-        message: string
       }>(`/lessons/${lessonId}/submit-answer`, {
         method: 'POST',
-        body: JSON.stringify({ answer }),
+        body: JSON.stringify({ question_index: questionIndex, answer }),
       })
       if (!res.success) return null
       return res.data
