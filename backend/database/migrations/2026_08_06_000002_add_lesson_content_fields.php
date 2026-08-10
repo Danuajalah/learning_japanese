@@ -13,7 +13,7 @@ return new class extends Migration
             $table->json('questions')->nullable()->after('content');
             $table->string('difficulty')->nullable()->after('questions');
             $table->string('content_type')->nullable()->after('difficulty');
-            $table->string('passing_score')->nullable()->after('content_type');
+            $table->integer('passing_score')->nullable()->after('content_type');
             $table->string('unlock_requirement')->nullable()->after('passing_score');
         });
     }

@@ -24,19 +24,24 @@ export default function LessonDetail() {
     message: string
   } | null>(null)
 
+  const [isLocked, setIsLocked] = useState(false)
+
   const loadLesson = useCallback(async () => {
     if (!id) return
-    const data = await LearningService.getLesson(id)
-    if (data) {
+    const result = await LearningService.getLesson(id)
+    if (result) {
+      const rawQuestions = (result.lesson as any).questions || []
+      const questions = Array.isArray(rawQuestions) ? rawQuestions : (typeof rawQuestions === 'string' ? JSON.parse(rawQuestions) : [])
       setLesson({
-        ...data,
-        questions: data.questions || [],
+        ...result.lesson,
+        questions: questions,
       })
+      if (result.locked) {
+        setIsLocked(true)
+      }
     }
     setLoading(false)
   }, [id])
-
-  const isLocked = lesson?.status === 'locked'
 
   useEffect(() => {
     loadLesson()
@@ -189,7 +194,7 @@ export default function LessonDetail() {
               </div>
             )}
 
-            {step === 'content' && isLocked && (
+            {(step === 'content' || step === 'quiz') && isLocked && (
               <div className="space-y-6">
                 <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-8 shadow-sm text-center">
                   <span className="material-symbols-outlined text-6xl text-outline mb-4">lock</span>

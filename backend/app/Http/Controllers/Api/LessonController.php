@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\SupabaseService;
+use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Services\SupabaseService;
 
 class LessonController extends Controller
 {
@@ -20,49 +21,19 @@ class LessonController extends Controller
     {
         $userId = $request->attributes->get('supabase_user_id');
 
-        if (!$this->supabase->isConfigured()) {
-            return response()->json([
-                'success' => true,
-                'data' => [],
-                'message' => 'Supabase not configured - returning empty lessons',
-            ]);
-        }
-
         try {
-            $response = $this->supabase->get('lessons', [
-                'order' => 'order_index.asc',
-            ], true);
-
-            if ($response->failed()) {
-                return response()->json([
-                    'success' => true,
-                    'data' => [],
-                    'message' => 'Failed to fetch from Supabase - returning empty',
-                ]);
-            }
-
-            $lessons = $response->json();
+            $lessons = Lesson::orderBy('order_index', 'asc')->get();
 
             if ($userId) {
-                $progressResponse = $this->supabase->get('user_progress', [
-                    'user_id' => 'eq.' . $userId,
-                ], true);
+                $progressMap = [];
+                foreach (\DB::table('user_progress')->where('user_id', $userId)->get() as $p) {
+                    $progressMap[$p->lesson_id] = $p;
+                }
 
-                if ($progressResponse->successful()) {
-                    $progressMap = [];
-                    foreach ($progressResponse->json() as $p) {
-                        $progressMap[$p['lesson_id']] = $p;
-                    }
-
-                    foreach ($lessons as &$lesson) {
-                        $lessonId = $lesson['id'];
-                        if (isset($progressMap[$lessonId])) {
-                            $lesson['status'] = 'completed';
-                            $lesson['progress'] = 100;
-                        } elseif ($lesson['status'] === 'completed') {
-                            $lesson['status'] = 'completed';
-                            $lesson['progress'] = 100;
-                        }
+                foreach ($lessons as $lesson) {
+                    if (isset($progressMap[$lesson->id])) {
+                        $lesson->status = 'completed';
+                        $lesson->progress = 100;
                     }
                 }
             }
@@ -75,7 +46,7 @@ class LessonController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => [],
-                'message' => 'Supabase unavailable',
+                'message' => 'Database unavailable',
             ]);
         }
     }
@@ -83,35 +54,25 @@ class LessonController extends Controller
     public function show(Request $request, string $lessonId): JsonResponse
     {
         try {
-            $userId = $request->attributes->get('supabase_user_id');
+            $lesson = Lesson::find($lessonId);
 
-            $response = $this->supabase->get('lessons', [
-                'id' => 'eq.' . $lessonId,
-            ], true);
-
-            if ($response->failed() || empty($response->json())) {
+            if (!$lesson) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Lesson not found',
                 ], 404);
             }
 
-            $lesson = $response->json()[0];
+            $userId = $request->attributes->get('supabase_user_id');
 
-            if ($userId && $lesson['unit_number'] > 1) {
-                $prevResponse = $this->supabase->get('lessons', [
-                    'unit_number' => 'eq.' . ($lesson['unit_number'] - 1),
-                ], true);
+            if ($userId && $lesson->unit_number > 1) {
+                $prevLesson = Lesson::where('unit_number', $lesson->unit_number - 1)->first();
 
-                if ($prevResponse->successful() && !empty($prevResponse->json())) {
-                    $prevLesson = $prevResponse->json()[0];
-
-                    $progressResponse = $this->supabase->get('user_progress', [
-                        'user_id' => 'eq.' . $userId,
-                        'lesson_id' => 'eq.' . $prevLesson['id'],
-                    ], true);
-
-                    $prevCompleted = $progressResponse->successful() && !empty($progressResponse->json());
+                if ($prevLesson) {
+                    $prevCompleted = \DB::table('user_progress')
+                        ->where('user_id', $userId)
+                        ->where('lesson_id', $prevLesson->id)
+                        ->exists();
 
                     if (!$prevCompleted) {
                         return response()->json([
@@ -131,7 +92,7 @@ class LessonController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Supabase unavailable',
+                'message' => 'Database unavailable',
             ], 500);
         }
     }
@@ -144,28 +105,35 @@ class LessonController extends Controller
         ]);
 
         try {
-            $response = $this->supabase->rpc('complete_lesson', [
-                'user_id' => $userId ?? '',
-                'lesson_id' => $lessonId,
-                'xp_earned' => $request->input('xp_earned'),
-            ], true);
-
-            if ($response->failed()) {
+            $lesson = Lesson::find($lessonId);
+            if (!$lesson) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Failed to complete lesson',
-                ], 500);
+                    'message' => 'Lesson not found',
+                ], 404);
             }
+
+            \DB::table('user_progress')->updateOrInsert(
+                ['user_id' => $userId, 'lesson_id' => $lessonId],
+                [
+                    'xp' => $request->input('xp_earned'),
+                    'level' => 1,
+                    'total_xp' => $request->input('xp_earned'),
+                    'streak' => 1,
+                    'last_completed_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
 
             return response()->json([
                 'success' => true,
-                'data' => $response->json(),
                 'message' => 'Lesson completed successfully',
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Supabase unavailable',
+                'message' => 'Database unavailable',
             ], 500);
         }
     }
@@ -175,36 +143,28 @@ class LessonController extends Controller
         $userId = $request->attributes->get('supabase_user_id');
 
         $request->validate([
+            'question_index' => 'required|integer|min:0',
             'answer' => 'required|string',
         ]);
 
         try {
-            $lessonResponse = $this->supabase->get('lessons', [
-                'id' => 'eq.' . $lessonId,
-            ], true);
+            $lesson = Lesson::find($lessonId);
 
-            if ($lessonResponse->failed() || empty($lessonResponse->json())) {
+            if (!$lesson) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Lesson not found',
                 ], 404);
             }
 
-            $lesson = $lessonResponse->json()[0];
+            if ($userId && $lesson->unit_number > 1) {
+                $prevLesson = Lesson::where('unit_number', $lesson->unit_number - 1)->first();
 
-            if ($userId && $lesson['unit_number'] > 1) {
-                $prevResponse = $this->supabase->get('lessons', [
-                    'unit_number' => 'eq.' . ($lesson['unit_number'] - 1),
-                ], true);
-
-                if ($prevResponse->successful() && !empty($prevResponse->json())) {
-                    $prevLesson = $prevResponse->json()[0];
-                    $progressResponse = $this->supabase->get('user_progress', [
-                        'user_id' => 'eq.' . $userId,
-                        'lesson_id' => 'eq.' . $prevLesson['id'],
-                    ], true);
-
-                    $prevCompleted = $progressResponse->successful() && !empty($progressResponse->json());
+                if ($prevLesson) {
+                    $prevCompleted = \DB::table('user_progress')
+                        ->where('user_id', $userId)
+                        ->where('lesson_id', $prevLesson->id)
+                        ->exists();
 
                     if (!$prevCompleted) {
                         return response()->json([
@@ -215,68 +175,39 @@ class LessonController extends Controller
                     }
                 }
             }
-            $questions = json_decode($lesson['questions'] ?? '[]', true) ?: [];
+
+            $questions = $lesson->questions ?? [];
+            $questions = is_string($questions) ? json_decode($questions, true) : $questions;
+            $questions = $questions ?? [];
+            $questionIndex = (int) $request->input('question_index');
             $userAnswer = $request->input('answer');
-            $passingScore = (int) ($lesson['passing_score'] ?? 70);
+            $passingScore = (int) ($lesson->passing_score ?? 70);
             $totalQuestions = count($questions);
 
-            if ($totalQuestions === 0) {
-                $xpEarned = $lesson['xp_reward'] ?? 50;
-                $completeResponse = $this->supabase->rpc('complete_lesson', [
-                    'user_id' => $userId ?? '',
-                    'lesson_id' => $lessonId,
-                    'xp_earned' => $xpEarned,
-                ], true);
-
+            if ($questionIndex < 0 || $questionIndex >= $totalQuestions) {
                 return response()->json([
-                    'success' => true,
-                    'data' => [
-                        'correct' => true,
-                        'score' => 100,
-                        'xp_earned' => $xpEarned,
-                        'passed' => true,
-                        'message' => 'Lesson completed!',
-                    ],
-                ]);
+                    'success' => false,
+                    'message' => 'Invalid question index',
+                ], 400);
             }
 
-            $correctCount = 0;
-            foreach ($questions as $q) {
-                if (isset($q['correct_answer']) && trim((string) $q['correct_answer']) === trim((string) $userAnswer)) {
-                    $correctCount++;
-                }
-            }
-
-            $score = $totalQuestions > 0 ? (int) round(($correctCount / $totalQuestions) * 100) : 0;
-            $passed = $score >= $passingScore;
-            $xpEarned = $passed ? ($lesson['xp_reward'] ?? 50) : 0;
-
-            if ($passed) {
-                $this->supabase->rpc('complete_lesson', [
-                    'user_id' => $userId ?? '',
-                    'lesson_id' => $lessonId,
-                    'xp_earned' => $xpEarned,
-                ], true);
-            }
+            $question = $questions[$questionIndex];
+            $isCorrect = isset($question['correct_answer']) && trim((string) $question['correct_answer']) === trim((string) $userAnswer);
+            $explanation = $question['explanation'] ?? '';
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'correct' => $correctCount === $totalQuestions,
-                    'score' => $score,
-                    'correct_count' => $correctCount,
+                    'question_index' => $questionIndex,
+                    'correct' => $isCorrect,
+                    'explanation' => $explanation,
                     'total_questions' => $totalQuestions,
-                    'xp_earned' => $xpEarned,
-                    'passed' => $passed,
-                    'message' => $passed
-                        ? 'Bagus! Anda lulus dengan skor ' . $score . '%'
-                        : 'Skor Anda: ' . $score . '%. Butuh ' . $passingScore . '% untuk lulus.',
                 ],
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Supabase unavailable',
+                'message' => 'Database unavailable',
             ], 500);
         }
     }

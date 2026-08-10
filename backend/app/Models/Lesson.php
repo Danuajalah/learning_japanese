@@ -15,6 +15,12 @@ class Lesson extends Model
         'title',
         'subtitle',
         'description',
+        'content',
+        'questions',
+        'difficulty',
+        'content_type',
+        'passing_score',
+        'unlock_requirement',
         'unit_number',
         'status',
         'xp_reward',
@@ -28,5 +34,7 @@ class Lesson extends Model
         'xp_reward' => 'integer',
         'estimated_minutes' => 'integer',
         'order_index' => 'integer',
+        'passing_score' => 'integer',
+        'questions' => 'array',
     ];
 }

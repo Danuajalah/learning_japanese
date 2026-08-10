@@ -23,7 +23,7 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
     if (!response.ok) {
       const result = await response.json().catch(() => ({}))
-      return { success: false, message: result.message || 'API request failed', data: null as T }
+      return { success: false, message: result.message || 'API request failed', data: (result.data ?? null) as T }
     }
 
     return await response.json()
@@ -48,17 +48,30 @@ export class LearningService {
     try {
       const res = await apiFetch<Lesson[]>('/lessons')
       if (!res.success) return []
-      return res.data || []
+      const lessons = res.data || []
+      return lessons.map((lesson: any) => ({
+        ...lesson,
+        questions: typeof lesson.questions === 'string' ? JSON.parse(lesson.questions) : (lesson.questions || []),
+      }))
     } catch {
       return []
     }
   }
 
-  static async getLesson(id: string): Promise<Lesson | null> {
+  static async getLesson(id: string): Promise<{ lesson: Lesson; locked?: boolean } | null> {
     try {
       const res = await apiFetch<Lesson>(`/lessons/${id}`)
-      if (!res.success) return null
-      return res.data
+      if (!res.success) {
+        if (res.data && (res.data as any).locked) {
+          return { lesson: res.data, locked: true }
+        }
+        return null
+      }
+      const lesson = res.data
+      if (lesson && typeof lesson.questions === 'string') {
+        lesson.questions = JSON.parse(lesson.questions)
+      }
+      return { lesson }
     } catch {
       return null
     }
