@@ -29,6 +29,7 @@ export default function LessonDetail() {
     passed: boolean
     message: string
   } | null>(null)
+  const [showContinuePopup, setShowContinuePopup] = useState(false)
 
   const loadLesson = useCallback(async () => {
     if (!id) return
@@ -116,7 +117,15 @@ export default function LessonDetail() {
   const handleComplete = async () => {
     if (!lesson) return
     await LearningService.updateLessonProgress(lesson.id, lesson.xp_reward)
-    window.location.href = '/'
+    if (lesson.unit_number === 1) {
+      setShowContinuePopup(true)
+    } else {
+      window.location.href = '/'
+    }
+  }
+
+  const goToPractice = () => {
+    window.location.href = '/practice?category=kana-hiragana'
   }
 
   const currentQuestion = lesson?.questions?.[questionIndex]
@@ -478,6 +487,36 @@ export default function LessonDetail() {
                     <span>Coba Lagi</span>
                   </button>
                 )}
+              </div>
+            )}
+
+            {showContinuePopup && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                <div className="bg-surface rounded-2xl p-6 shadow-xl max-w-sm w-full animate-bounce-slow">
+                  <div className="text-center">
+                    <span className="material-symbols-outlined text-5xl text-primary mb-3">school</span>
+                    <h3 className="font-headline-lg text-headline-lg font-bold text-on-surface mb-2">
+                      Selamat! Unit 1 Selesai
+                    </h3>
+                    <p className="text-on-surface-variant text-sm mb-6">
+                      Apakah kamu ingin melanjutkan menghafal dan belajar hiragana?
+                    </p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => window.location.href = '/'}
+                        className="flex-1 py-3 rounded-xl border border-outline-variant text-on-surface font-semibold active:scale-95 transition-transform"
+                      >
+                        Nanti Saja
+                      </button>
+                      <button
+                        onClick={goToPractice}
+                        className="flex-1 py-3 rounded-xl bg-secondary text-white font-semibold active:scale-95 transition-transform squishy-btn"
+                      >
+                        Ya, Lanjutkan
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </main>

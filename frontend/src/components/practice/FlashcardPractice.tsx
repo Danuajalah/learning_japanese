@@ -14,94 +14,76 @@ export interface Flashcard {
   example?: string
 }
 
+const HIRAGANA_CHART: { char: string; romaji: string; group: string }[] = [
+  ...['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'].map((c) => {
+    const map: Record<string, string> = {'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko','さ':'sa','し':'shi','す':'su','せ':'se','そ':'so','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to','な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no','は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho','ま':'ma','み':'mi','む':'mu','め':'me','も':'mo','や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro','わ':'wa','を':'wo','ん':'n'}
+    return { char: c, romaji: map[c], group: 'seion' }
+  }),
+  ...['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ'].map((c) => {
+    const map: Record<string, string> = {'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go','ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do','ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo'}
+    return { char: c, romaji: map[c], group: 'dakuten' }
+  }),
+  ...['ぱ','ぴ','ぷ','ぺ','ぽ'].map((c) => {
+    const map: Record<string, string> = {'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po'}
+    return { char: c, romaji: map[c], group: 'handakuten' }
+  }),
+  ...['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ'].map((c) => {
+    const map: Record<string, string> = {'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho','ちゃ':'cha','ちゅ':'chu','ちょ':'cho','にゃ':'nya','にゅ':'nyu','にょ':'nyo','ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo','りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','じゃ':'ja','じゅ':'ju','じょ':'jo','びゃ':'bya','びゅ':'byu','びょ':'byo','ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo'}
+    return { char: c, romaji: map[c], group: 'yoon' }
+  }),
+]
+
+const KATAKANA_CHART: { char: string; romaji: string; group: string }[] = [
+  ...['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'].map((c) => {
+    const map: Record<string, string> = {'ア':'a','イ':'i','ウ':'u','エ':'e','オ':'o','カ':'ka','キ':'ki','ク':'ku','ケ':'ke','コ':'ko','サ':'sa','シ':'shi','ス':'su','セ':'se','ソ':'so','タ':'ta','チ':'chi','ツ':'tsu','テ':'te','ト':'to','ナ':'na','ニ':'ni','ヌ':'nu','ネ':'ne','ノ':'no','ハ':'ha','ヒ':'hi','フ':'fu','ヘ':'he','ホ':'ho','マ':'ma','ミ':'mi','ム':'mu','メ':'me','モ':'mo','ヤ':'ya','ユ':'yu','ヨ':'yo','ラ':'ra','リ':'ri','ル':'ru','レ':'re','ロ':'ro','ワ':'wa','ヲ':'wo','ン':'n'}
+    return { char: c, romaji: map[c], group: 'seion' }
+  }),
+  ...['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ'].map((c) => {
+    const map: Record<string, string> = {'ガ':'ga','ギ':'gi','グ':'gu','ゲ':'ge','ゴ':'go','ザ':'za','ジ':'ji','ズ':'zu','ゼ':'ze','ゾ':'zo','ダ':'da','ヂ':'ji','ヅ':'zu','デ':'de','ド':'do','バ':'ba','ビ':'bi','ブ':'bu','ベ':'be','ボ':'bo'}
+    return { char: c, romaji: map[c], group: 'dakuten' }
+  }),
+  ...['パ','ピ','プ','ペ','ポ'].map((c) => {
+    const map: Record<string, string> = {'パ':'pa','ピ':'pi','プ':'pu','ペ':'pe','ポ':'po'}
+    return { char: c, romaji: map[c], group: 'handakuten' }
+  }),
+  ...['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'].map((c) => {
+    const map: Record<string, string> = {'キャ':'kya','キュ':'kyu','キョ':'kyo','シャ':'sha','シュ':'shu','ショ':'sho','チャ':'cha','チュ':'chu','チョ':'cho','ニャ':'nya','ニュ':'nyu','ニョ':'nyo','ヒャ':'hya','ヒュ':'hyu','ヒョ':'hyo','ミャ':'mya','ミュ':'myu','ミョ':'myo','リャ':'rya','リュ':'ryu','リョ':'ryo','ギャ':'gya','ギュ':'gyu','ギョ':'gyo','ジャ':'ja','ジュ':'ju','ジョ':'jo','ビャ':'bya','ビュ':'byu','ビョ':'byo','ピャ':'pya','ピュ':'pyu','ピョ':'pyo'}
+    return { char: c, romaji: map[c], group: 'yoon' }
+  }),
+]
+
 const FLASHCARDS: Record<FlashcardCategory, Flashcard[]> = {
-  'kana-hiragana': [
-    { id: 'h1', category: 'kana-hiragana', front: 'あ', frontHint: 'Hiragana', back: 'a', backHint: 'Sound', example: 'あめ (ame) - rain' },
-    { id: 'h2', category: 'kana-hiragana', front: 'い', frontHint: 'Hiragana', back: 'i', backHint: 'Sound', example: 'いえ (ie) - house' },
-    { id: 'h3', category: 'kana-hiragana', front: 'う', frontHint: 'Hiragana', back: 'u', backHint: 'Sound', example: 'うみ (umi) - sea' },
-    { id: 'h4', category: 'kana-hiragana', front: 'え', frontHint: 'Hiragana', back: 'e', backHint: 'Sound', example: 'えいが (eiga) - movie' },
-    { id: 'h5', category: 'kana-hiragana', front: 'お', frontHint: 'Hiragana', back: 'o', backHint: 'Sound', example: 'おさけ (osake) - sake' },
-    { id: 'h6', category: 'kana-hiragana', front: 'か', frontHint: 'Hiragana', back: 'ka', backHint: 'Sound', example: 'かえる (kaeru) - to change' },
-    { id: 'h7', category: 'kana-hiragana', front: 'き', frontHint: 'Hiragana', back: 'ki', backHint: 'Sound', example: 'きつね (kitsune) - fox' },
-    { id: 'h8', category: 'kana-hiragana', front: 'く', frontHint: 'Hiragana', back: 'ku', backHint: 'Sound', example: 'くるま (kuruma) - car' },
-    { id: 'h9', category: 'kana-hiragana', front: 'け', frontHint: 'Hiragana', back: 'ke', backHint: 'Sound', example: 'けいこ (keiko) - practice' },
-    { id: 'h10', category: 'kana-hiragana', front: 'こ', frontHint: 'Hiragana', back: 'ko', backHint: 'Sound', example: 'こども (kodomo) - child' },
-    { id: 'h11', category: 'kana-hiragana', front: 'さ', frontHint: 'Hiragana', back: 'sa', backHint: 'Sound', example: 'さがす (sagasu) - to search' },
-    { id: 'h12', category: 'kana-hiragana', front: 'し', frontHint: 'Hiragana', back: 'shi', backHint: 'Sound', example: 'してい (shitei) - progress' },
-    { id: 'h13', category: 'kana-hiragana', front: 'す', frontHint: 'Hiragana', back: 'su', backHint: 'Sound', example: 'すき (suki) - like' },
-    { id: 'h14', category: 'kana-hiragana', front: 'せ', frontHint: 'Hiragana', back: 'se', backHint: 'Sound', example: 'せかい (sekai) - world' },
-    { id: 'h15', category: 'kana-hiragana', front: 'そ', frontHint: 'Hiragana', back: 'so', backHint: 'Sound', example: 'そら (sora) - sky' },
-    { id: 'h16', category: 'kana-hiragana', front: 'た', frontHint: 'Hiragana', back: 'ta', backHint: 'Sound', example: 'たべもの (tabemono) - food' },
-    { id: 'h17', category: 'kana-hiragana', front: 'ち', frontHint: 'Hiragana', back: 'chi', backHint: 'Sound', example: 'ちがい (chigai) - difference' },
-    { id: 'h18', category: 'kana-hiragana', front: 'つ', frontHint: 'Hiragana', back: 'tsu', backHint: 'Sound', example: 'つもり (tsumori) - intention' },
-    { id: 'h19', category: 'kana-hiragana', front: 'て', frontHint: 'Hiragana', back: 'te', backHint: 'Sound', example: 'てがみ (tegami) - letter' },
-    { id: 'h20', category: 'kana-hiragana', front: 'と', frontHint: 'Hiragana', back: 'to', backHint: 'Sound', example: 'ともだち (tomodachi) - friend' },
-  ],
-  'kana-katakana': [
-    { id: 'k1', category: 'kana-katakana', front: 'ア', frontHint: 'Katakana', back: 'a', backHint: 'Sound', example: 'アメリカ (amerika) - America' },
-    { id: 'k2', category: 'kana-katakana', front: 'イ', frontHint: 'Katakana', back: 'i', backHint: 'Sound', example: 'イギリス (igirisu) - England' },
-    { id: 'k3', category: 'kana-katakana', front: 'ウ', frontHint: 'Katakana', back: 'u', backHint: 'Sound', example: 'ウクサ (ukusa) - grass' },
-    { id: 'k4', category: 'kana-katakana', front: 'エ', frontHint: 'Katakana', back: 'e', backHint: 'Sound', example: 'エレベーター (erebe-ta-) - elevator' },
-    { id: 'k5', category: 'kana-katakana', front: 'オ', frontHint: 'Katakana', back: 'o', backHint: 'Sound', example: 'オレンジ (orenji) - orange' },
-    { id: 'k6', category: 'kana-katakana', front: 'カ', frontHint: 'Katakana', back: 'ka', backHint: 'Sound', example: 'カカシ (kakashi) - scarecrow' },
-    { id: 'k7', category: 'kana-katakana', front: 'キ', frontHint: 'Katakana', back: 'ki', backHint: 'Sound', example: 'キツネ (kitsune) - fox' },
-    { id: 'k8', category: 'kana-katakana', front: 'ク', frontHint: 'Katakana', back: 'ku', backHint: 'Sound', example: 'クルマ (kuruma) - car' },
-    { id: 'k9', category: 'kana-katakana', front: 'ケ', frontHint: 'Katakana', back: 'ke', backHint: 'Sound', example: 'ケーキ (keeki) - cake' },
-    { id: 'k10', category: 'kana-katakana', front: 'コ', frontHint: 'Katakana', back: 'ko', backHint: 'Sound', example: 'ココロ (kokoro) - heart/mind' },
-    { id: 'k11', category: 'kana-katakana', front: 'サ', frontHint: 'Katakana', back: 'sa', backHint: 'Sound', example: 'サクラ (sakura) - cherry blossom' },
-    { id: 'k12', category: 'kana-katakana', front: 'シ', frontHint: 'Katakana', back: 'shi', backHint: 'Sound', example: 'シティ (shitī) - city' },
-    { id: 'k13', category: 'kana-katakana', front: 'ス', frontHint: 'Katakana', back: 'su', backHint: 'Sound', example: 'ススメ (susume) - encouragement' },
-    { id: 'k14', category: 'kana-katakana', front: 'セ', frontHint: 'Katakana', back: 'se', backHint: 'Sound', example: 'セリコ (seriko) - silk' },
-    { id: 'k15', category: 'kana-katakana', front: 'ソ', frontHint: 'Katakana', back: 'so', backHint: 'Sound', example: 'ソファ (sofā) - sofa' },
-    { id: 'k16', category: 'kana-katakana', front: 'タ', frontHint: 'Katakana', back: 'ta', backHint: 'Sound', example: 'タクシー (takushī) - taxi' },
-    { id: 'k17', category: 'kana-katakana', front: 'チ', frontHint: 'Katakana', back: 'chi', backHint: 'Sound', example: 'チーズ (chīzu) - cheese' },
-    { id: 'k18', category: 'kana-katakana', front: 'ツ', frontHint: 'Katakana', back: 'tsu', backHint: 'Sound', example: 'ツバメ (tsubame) - swallow' },
-    { id: 'k19', category: 'kana-katakana', front: 'テ', frontHint: 'Katakana', back: 'te', backHint: 'Sound', example: 'テスト (tesuto) - test' },
-    { id: 'k20', category: 'kana-katakana', front: 'ト', frontHint: 'Katakana', back: 'to', backHint: 'Sound', example: 'トイレ (toire) - toilet' },
-  ],
+  'kana-hiragana': HIRAGANA_CHART.map((item, idx) => ({
+    id: 'h' + (idx + 1),
+    category: 'kana-hiragana' as FlashcardCategory,
+    front: item.char,
+    back: item.romaji,
+    frontHint: 'Hiragana',
+    backHint: 'Romaji',
+    example: '',
+  })),
+  'kana-katakana': KATAKANA_CHART.map((item, idx) => ({
+    id: 'k' + (idx + 1),
+    category: 'kana-katakana' as FlashcardCategory,
+    front: item.char,
+    back: item.romaji,
+    frontHint: 'Katakana',
+    backHint: 'Romaji',
+    example: '',
+  })),
   'vocabulary': [
     { id: 'v1', category: 'vocabulary', front: '食べる', frontHint: 'Verb', back: 'to eat', backHint: 'Meaning', example: 'たべもの (food)' },
     { id: 'v2', category: 'vocabulary', front: '飲む', frontHint: 'Verb', back: 'to drink', backHint: 'Meaning', example: 'のみもの (drink)' },
-    { id: 'v3', category: 'vocabulary', front: '行く', frontHint: 'Verb', back: 'to go', backHint: 'Meaning', example: 'ゆく (go) - progressive' },
-    { id: 'v4', category: 'vocabulary', front: '来る', frontHint: 'Verb', back: 'to come', backHint: 'Meaning', example: 'らい (come) - irregular' },
-    { id: 'v5', category: 'vocabulary', front: 'する', frontHint: 'Verb', back: 'to do', backHint: 'Meaning', example: 'させる (make someone do)' },
-    { id: 'v6', category: 'vocabulary', front: 'ある', frontHint: 'Verb', back: 'to exist (inanimate)', backHint: 'Meaning', example: 'ある (exist - things)' },
-    { id: 'v7', category: 'vocabulary', front: 'いる', frontHint: 'Verb', back: 'to exist (animate)', backHint: 'Meaning', example: 'いる (exist - people)' },
-    { id: 'v8', category: 'vocabulary', front: 'ほしい', frontHint: 'Auxiliary', back: 'I want to...', backHint: 'Meaning', example: 'ものがほしい (want things)' },
-    { id: 'v9', category: 'vocabulary', front: 'もらう', frontHint: 'Verb', back: 'to receive', backHint: 'Meaning', example: 'もらいました (received)' },
-    { id: 'v10', category: 'vocabulary', front: 'あげる', frontHint: 'Verb', back: 'to give', backHint: 'Meaning', example: 'あげます (give)' },
-    { id: 'v11', category: 'vocabulary', front: 'やる', frontHint: 'Verb', back: 'to do for someone', backHint: 'Meaning', example: 'やってあげる (do for)' },
-    { id: 'v12', category: 'vocabulary', front: 'くれる', frontHint: 'Verb', back: 'to give (to me)', backHint: 'Meaning', example: 'くれました (gave me)' },
-    { id: 'v13', category: 'vocabulary', front: 'できる', frontHint: 'Potential', back: 'can do', backHint: 'Meaning', example: 'できる (can) - potential' },
-    { id: 'v14', category: 'vocabulary', front: 'わかる', frontHint: 'Verb', back: 'to understand', backHint: 'Meaning', example: 'わかった (understood)' },
-    { id: 'v15', category: 'vocabulary', front: 'できない', frontHint: 'Negative', back: 'cannot do', backHint: 'Meaning', example: 'できません (cannot)' },
-    { id: 'v16', category: 'vocabulary', front: 'じゃない', frontHint: 'Negative', back: 'is not', backHint: 'Meaning', example: 'じゃないです (isn\'t)' },
-    { id: 'v17', category: 'vocabulary', front: 'だ', frontHint: 'Copula', back: 'is (rough)', backHint: 'Meaning', example: 'だ (is) - plain form' },
-    { id: 'v18', category: 'vocabulary', front: 'です', frontHint: 'Copula', back: 'is (polite)', backHint: 'Meaning', example: 'です (is) - polite form' },
-    { id: 'v19', category: 'vocabulary', front: 'ます', frontHint: 'Auxiliary', back: 'polite (do)', backHint: 'Meaning', example: 'します (does) - polite' },
-    { id: 'v20', category: 'vocabulary', front: 'ません', frontHint: 'Auxiliary', back: 'polite negative', backHint: 'Meaning', example: 'しません (don\'t do)' },
+    { id: 'v3', category: 'vocabulary', front: '行く', frontHint: 'Verb', back: 'to go', backHint: 'Meaning', example: 'ゆく (go)' },
+    { id: 'v4', category: 'vocabulary', front: '来る', frontHint: 'Verb', back: 'to come', backHint: 'Meaning', example: 'らい (come)' },
+    { id: 'v5', category: 'vocabulary', front: 'する', frontHint: 'Verb', back: 'to do', backHint: 'Meaning', example: 'させる (make do)' },
   ],
   'grammar': [
-    { id: 'g1', category: 'grammar', front: '～は', frontHint: 'Particle', back: 'topic marker', backHint: 'Function', example: 'わたしはせんせいです (I am a teacher)' },
-    { id: 'g2', category: 'grammar', front: '～を', frontHint: 'Particle', back: 'object marker', backHint: 'Function', example: 'ごはんをたべる (eat rice)' },
-    { id: 'g3', category: 'grammar', front: '～が', frontHint: 'Particle', back: 'subject marker', backHint: 'Function', example: 'ねこがいる (there is a cat)' },
-    { id: 'g4', category: 'grammar', front: '～に', frontHint: 'Particle', back: 'location/time/dative', backHint: 'Function', example: 'とうきょうにある (exists in Kyoto)' },
-    { id: 'g5', category: 'grammar', front: '～の', frontHint: 'Particle', back: 'possessive', backHint: 'Function', example: 'わたしのhon (my book)' },
-    { id: 'g6', category: 'grammar', front: '～で', frontHint: 'Particle', back: 'location of action/at', backHint: 'Function', example: 'がっこうでべんきょうする (study at school)' },
-    { id: 'g7', category: 'grammar', front: '～て', frontHint: 'Conjugation', back: 'te-form', backHint: 'Function', example: 'たべてください (please eat)' },
-    { id: 'g8', category: 'grammar', front: '～ない', frontHint: 'Conjugation', back: 'nai-form (negative)', backHint: 'Function', example: 'たべない (don\'t eat)' },
-    { id: 'g9', category: 'grammar', front: '～し', frontHint: 'Conjugation', back: 'shimo-stem', backHint: 'Function', example: 'たべし (ate - literary)' },
-    { id: 'g10', category: 'grammar', front: '～か', frontHint: 'Particle', back: 'question particle', backHint: 'Function', example: 'ねこかい? (is it a cat?)' },
-    { id: 'g11', category: 'grammar', front: '～よ', frontHint: 'Particle', back: 'assertion particle', backHint: 'Function', example: 'ねこよ (it\'s a cat!)' },
-    { id: 'g12', category: 'grammar', front: '～ね', frontHint: 'Particle', back: 'seeking confirmation', backHint: 'Function', example: 'ねこね (isn\'t it?)' },
-    { id: 'g13', category: 'grammar', front: '～かも', frontHint: 'Expression', back: 'maybe', backHint: 'Function', example: 'ねこかもしれない (might be a cat)' },
-    { id: 'g14', category: 'grammar', front: '～でしょう', frontHint: 'Conjugation', back: 'polite suggestion/assertion', backHint: 'Function', example: 'でしょう (probably)' },
-    { id: 'g15', category: 'grammar', front: '～たい', frontHint: 'Auxiliary', back: 'want to do', backHint: 'Function', example: 'たべたい (want to eat)' },
-    { id: 'g16', category: 'grammar', front: '～ている', frontHint: 'Conjugation', back: 'progressive/continuation', backHint: 'Function', example: 'たべている (is eating)' },
-    { id: 'g17', category: 'grammar', front: '～ました', frontHint: 'Conjugation', back: 'past polite', backHint: 'Function', example: 'たべました (ate)' },
-    { id: 'g18', category: 'grammar', front: '～てください', frontHint: 'Conjugation', back: 'please do', backHint: 'Function', example: 'たべてください (please eat)' },
-    { id: 'g19', category: 'grammar', front: '～たいです', frontHint: 'Conjugation', back: 'polite want to do', backHint: 'Function', example: 'たべたいです (want to eat)' },
-    { id: 'g20', category: 'grammar', front: '～ではありませんか', frontHint: 'Conjugation', back: 'polite negative question', backHint: 'Function', example: 'ではありませんか (isn\'t it?)' },
+    { id: 'g1', category: 'grammar', front: '～は', frontHint: 'Particle', back: 'topic marker', backHint: 'Function', example: 'わたしはせんせいです' },
+    { id: 'g2', category: 'grammar', front: '～を', frontHint: 'Particle', back: 'object marker', backHint: 'Function', example: 'ごはんをたべる' },
+    { id: 'g3', category: 'grammar', front: '～が', frontHint: 'Particle', back: 'subject marker', backHint: 'Function', example: 'ねこがいる' },
+    { id: 'g4', category: 'grammar', front: '～に', frontHint: 'Particle', back: 'location/dative', backHint: 'Function', example: 'とうきょうにある' },
+    { id: 'g5', category: 'grammar', front: '～の', frontHint: 'Particle', back: 'possessive', backHint: 'Function', example: 'わたしのほん' },
   ],
 }
 
@@ -112,8 +94,11 @@ const CATEGORY_LABELS: Record<FlashcardCategory, string> = {
   'grammar': 'Grammar',
 }
 
+type ViewMode = 'chart' | 'practice'
+
 export default function FlashcardPractice({ category = 'kana-hiragana' }: { category?: FlashcardCategory }) {
   const navigate = useNavigate()
+  const [viewMode, setViewMode] = useState<ViewMode>('chart')
   const [cards] = useState<Flashcard[]>(FLASHCARDS[category])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
@@ -158,6 +143,74 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
   }
 
   const progress = ((currentIndex + 1) / cards.length) * 100
+
+  const chartData = category === 'kana-hiragana' ? HIRAGANA_CHART : KATAKANA_CHART
+
+  if (viewMode === 'chart') {
+    return (
+      <>
+        <TopAppBar />
+        <DesktopNav active="practice" />
+        <div className="pt-20 max-w-4xl mx-auto px-container-margin pb-16 bg-sakura-pattern min-h-screen">
+          <div className="flex justify-between items-center mb-6">
+            <button
+              onClick={handleBack}
+              className="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant squish-click"
+            >
+              <span className="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h2 className="font-headline-lg text-headline-lg font-bold text-on-surface">
+              {CATEGORY_LABELS[category]} Chart
+            </h2>
+            <div className="w-10" />
+          </div>
+
+          <div className="bg-surface-container-lowest rounded-2xl p-6 shadow-[0_4px_12px_rgba(134,78,90,0.05)] border border-outline-variant/30 mb-6">
+            <p className="text-on-surface-variant font-body-md text-sm mb-6 text-center">
+              Pelajari seluruh huruf {CATEGORY_LABELS[category]} beserta cara bacanya
+            </p>
+            <div className="space-y-6">
+              {['seion', 'dakuten', 'handakuten', 'yoon'].map((group) => {
+                const groupItems = chartData.filter((item) => item.group === group)
+                if (groupItems.length === 0) return null
+                const groupLabel = group === 'seion' ? 'Dasar' : group === 'dakuten' ? 'Dakuten (濁音)' : group === 'handakuten' ? 'Handakuten (半濁音)' : 'Yōon (拗音)'
+                return (
+                  <div key={group}>
+                    <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-3 text-xs">
+                      {groupLabel}
+                    </h3>
+                    <div className="grid grid-cols-5 sm:grid-cols-10 gap-3">
+                      {groupItems.map((item) => (
+                        <div key={item.char} className="flex flex-col items-center p-2 rounded-xl hover:bg-surface-container-highest/50 transition-colors">
+                          <span className="font-display-jp text-display-jp text-on-surface text-2xl sm:text-3xl">
+                            {item.char}
+                          </span>
+                          <span className="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">
+                            {item.romaji}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <button
+            onClick={() => setViewMode('practice')}
+            className="w-full bg-secondary text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform squishy-btn flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+              school
+            </span>
+            <span>Mulai Latihan</span>
+          </button>
+        </div>
+        <BottomNavBar active="practice" />
+      </>
+    )
+  }
 
   return (
     <>
@@ -211,7 +264,7 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
                     <span className="font-label-caps text-label-caps text-on-surface-variant">Tap to flip</span>
                   </div>
                 </div>
-                <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-surface-container-lowest to-surface-container-low">
+                <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-surface-container-lowest to-surface-container">
                   <span className="text-sm font-label-caps text-label-caps text-primary mb-1">
                     {card.backHint}
                   </span>
