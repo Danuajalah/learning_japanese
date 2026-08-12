@@ -130,18 +130,40 @@ class LessonController extends Controller
                 ], 401);
             }
 
-            \DB::table('user_progress')->updateOrInsert(
-                ['user_id' => $userId, 'lesson_id' => $lessonId],
-                [
-                    'xp' => $request->input('xp_earned'),
+            $now = now();
+            $xpEarned = (int) $request->input('xp_earned');
+
+            $existing = \DB::table('user_progress')
+                ->where('user_id', $userId)
+                ->where('lesson_id', $lessonId)
+                ->first();
+
+            if ($existing) {
+                \DB::table('user_progress')
+                    ->where('user_id', $userId)
+                    ->where('lesson_id', $lessonId)
+                    ->update([
+                        'xp' => $xpEarned,
+                        'level' => 1,
+                        'total_xp' => $xpEarned,
+                        'streak' => 1,
+                        'last_completed_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+            } else {
+                \DB::table('user_progress')->insert([
+                    'id' => \Illuminate\Support\Str::uuid(),
+                    'user_id' => $userId,
+                    'lesson_id' => $lessonId,
+                    'xp' => $xpEarned,
                     'level' => 1,
-                    'total_xp' => $request->input('xp_earned'),
+                    'total_xp' => $xpEarned,
                     'streak' => 1,
-                    'last_completed_at' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
+                    'last_completed_at' => $now,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
 
             return response()->json([
                 'success' => true,

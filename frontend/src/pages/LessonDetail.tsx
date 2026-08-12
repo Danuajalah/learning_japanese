@@ -71,19 +71,24 @@ export default function LessonDetail() {
 
     const res = await LearningService.submitAnswer(lesson.id, questionIndex, selectedAnswer)
     if (res) {
-      const newResult = { correct: res.correct, explanation: res.explanation }
-      const newResults = [...results, newResult]
-      setResults(newResults)
+      setResults(prev => [...prev, { correct: res.correct, explanation: res.explanation }])
       setCurrentExplanation(res.explanation || '')
       setAnswerState(res.correct ? 'correct' : 'wrong')
+    }
+    setSubmitting(false)
+  }
 
+  const handleNextStep = () => {
+    if (!lesson) return
+
+    if (answerState === 'correct' || answerState === 'wrong') {
       if (questionIndex < lesson.questions.length - 1) {
         setQuestionIndex(prev => prev + 1)
         setSelectedAnswer('')
         setAnswerState('idle')
         setCurrentExplanation('')
       } else {
-        const correctCount = newResults.filter(r => r.correct).length
+        const correctCount = results.filter(r => r.correct).length
         const total = lesson.questions.length
         const score = total > 0 ? Math.round((correctCount / total) * 100) : 0
         const passed = score >= (lesson.passing_score || 70)
@@ -106,7 +111,6 @@ export default function LessonDetail() {
         setStep('result')
       }
     }
-    setSubmitting(false)
   }
 
   const handleComplete = async () => {
@@ -286,8 +290,8 @@ export default function LessonDetail() {
                   </div>
                 </div>
 
-                <div className={`bg-surface-container-lowest rounded-xl border p-5 shadow-sm transition-colors ${
-                  answerState === 'correct' ? 'border-green-500 bg-green-50' : answerState === 'wrong' ? 'border-red-500 bg-red-50' : 'border-outline-variant'
+                <div className={`bg-surface-container-lowest rounded-xl border p-5 shadow-sm transition-all duration-300 ${
+                  answerState === 'correct' ? 'border-green-500 bg-green-50 scale-[1.01]' : answerState === 'wrong' ? 'border-red-500 bg-red-50 scale-[1.01]' : 'border-outline-variant'
                 }`}>
                   <p className="text-on-surface text-base font-medium mb-6">
                     {currentQuestion.question}
@@ -374,8 +378,8 @@ export default function LessonDetail() {
                 )}
 
                 <button
-                  onClick={handleSubmitAnswer}
-                  disabled={!selectedAnswer || submitting}
+                  onClick={answerState === 'idle' ? handleSubmitAnswer : handleNextStep}
+                  disabled={submitting || (answerState === 'idle' && (!selectedAnswer))}
                   className={`w-full font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-all squishy-btn flex items-center justify-center gap-2 ${
                     answerState === 'correct'
                       ? 'bg-green-600 text-white'
