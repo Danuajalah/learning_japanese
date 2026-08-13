@@ -7,6 +7,8 @@ use App\Models\Lesson;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Services\SupabaseService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LessonController extends Controller
 {
@@ -26,7 +28,7 @@ class LessonController extends Controller
 
             if ($userId) {
                 $progressMap = [];
-                foreach (\DB::table('user_progress')->where('user_id', $userId)->get() as $p) {
+                foreach (DB::table('user_progress')->where('user_id', $userId)->get() as $p) {
                     $progressMap[$p->lesson_id] = $p;
                 }
 
@@ -79,7 +81,7 @@ class LessonController extends Controller
                 $prevLesson = Lesson::where('unit_number', $lesson->unit_number - 1)->first();
 
                 if ($prevLesson) {
-                    $prevCompleted = \DB::table('user_progress')
+                    $prevCompleted = DB::table('user_progress')
                         ->where('user_id', $userId)
                         ->where('lesson_id', $prevLesson->id)
                         ->exists();
@@ -133,13 +135,13 @@ class LessonController extends Controller
             $now = now();
             $xpEarned = (int) $request->input('xp_earned');
 
-            $existing = \DB::table('user_progress')
+            $existing = DB::table('user_progress')
                 ->where('user_id', $userId)
                 ->where('lesson_id', $lessonId)
                 ->first();
 
             if ($existing) {
-                \DB::table('user_progress')
+                DB::table('user_progress')
                     ->where('user_id', $userId)
                     ->where('lesson_id', $lessonId)
                     ->update([
@@ -151,7 +153,7 @@ class LessonController extends Controller
                         'updated_at' => $now,
                     ]);
             } else {
-                \DB::table('user_progress')->insert([
+                DB::table('user_progress')->insert([
                     'id' => \Illuminate\Support\Str::uuid(),
                     'user_id' => $userId,
                     'lesson_id' => $lessonId,
@@ -170,7 +172,7 @@ class LessonController extends Controller
                 'message' => 'Lesson completed successfully',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Complete lesson failed', [
+            Log::error('Complete lesson failed', [
                 'user_id' => $userId,
                 'lesson_id' => $lessonId,
                 'error' => $e->getMessage(),
@@ -205,7 +207,7 @@ class LessonController extends Controller
                 $prevLesson = Lesson::where('unit_number', $lesson->unit_number - 1)->first();
 
                 if ($prevLesson) {
-                    $prevCompleted = \DB::table('user_progress')
+                    $prevCompleted = DB::table('user_progress')
                         ->where('user_id', $userId)
                         ->where('lesson_id', $prevLesson->id)
                         ->exists();

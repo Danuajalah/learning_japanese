@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopAppBar, BottomNavBar, DesktopNav } from '@/components'
 
@@ -23,41 +23,217 @@ interface KanaItem {
 }
 
 const HIRAGANA_CHART: KanaItem[] = [
-  ...['あ','い','う','え','お','か','き','く','け','こ','さ','し','す','せ','そ','た','ち','つ','て','と','な','に','ぬ','ね','の','は','ひ','ふ','へ','ほ','ま','み','む','め','も','や','ゆ','よ','ら','り','る','れ','ろ','わ','を','ん'].map((c) => {
-    const map: Record<string, string> = {'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko','さ':'sa','し':'shi','す':'su','せ':'se','そ':'so','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to','な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no','は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho','ま':'ma','み':'mi','む':'mu','め':'me','も':'mo','や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro','わ':'wa','を':'wo','ん':'n'}
-    return { char: c, romaji: map[c], group: 'seion' }
-  }),
-  ...['が','ぎ','ぐ','げ','ご','ざ','じ','ず','ぜ','ぞ','だ','ぢ','づ','で','ど','ば','び','ぶ','べ','ぼ'].map((c) => {
-    const map: Record<string, string> = {'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go','ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do','ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo'}
-    return { char: c, romaji: map[c], group: 'dakuten' }
-  }),
-  ...['ぱ','ぴ','ぷ','ぺ','ぽ'].map((c) => {
-    const map: Record<string, string> = {'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po'}
-    return { char: c, romaji: map[c], group: 'handakuten' }
-  }),
-  ...['きゃ','きゅ','きょ','しゃ','しゅ','しょ','ちゃ','ちゅ','ちょ','にゃ','にゅ','にょ','ひゃ','ひゅ','ひょ','みゃ','みゅ','みょ','りゃ','りゅ','りょ','ぎゃ','ぎゅ','ぎょ','じゃ','じゅ','じょ','びゃ','びゅ','びょ','ぴゃ','ぴゅ','ぴょ'].map((c) => {
-    const map: Record<string, string> = {'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho','ちゃ':'cha','ちゅ':'chu','ちょ':'cho','にゃ':'nya','にゅ':'nyu','にょ':'nyo','ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo','りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo','じゃ':'ja','じゅ':'ju','じょ':'jo','びゃ':'bya','びゅ':'byu','びょ':'byo','ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo'}
-    return { char: c, romaji: map[c], group: 'yoon' }
-  }),
+  { char: 'あ', romaji: 'a', group: 'seion', stroke: '1. Curve left 2. Curve right', isParticle: false },
+  { char: 'い', romaji: 'i', group: 'seion', stroke: '1. Vertical 2. Curve right', isParticle: false },
+  { char: 'う', romaji: 'u', group: 'seion', stroke: '1. Horizontal 2. Vertical', isParticle: false },
+  { char: 'え', romaji: 'e', group: 'seion', stroke: '1. Vertical 2. Horizontal', isParticle: false },
+  { char: 'お', romaji: 'o', group: 'seion', stroke: '1. Curve outer 2. Vertical inner', isParticle: false },
+  { char: 'か', romaji: 'ka', group: 'seion', stroke: '1. Horizontal 2. Vertical 3. Hook right', isParticle: false },
+  { char: 'き', romaji: 'ki', group: 'seion', stroke: '1. Horizontal 2. Vertical', isParticle: false },
+  { char: 'く', romaji: 'ku', group: 'seion', stroke: '1. Curve top 2. Vertical bottom', isParticle: false },
+  { char: 'け', romaji: 'ke', group: 'seion', stroke: '1. Horizontal 2. Vertical', isParticle: false },
+  { char: 'こ', romaji: 'ko', group: 'seion', stroke: '1. Curve circle 2. Vertical inner', isParticle: false },
+  { char: 'さ', romaji: 'sa', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'し', romaji: 'shi', group: 'seion', stroke: '1. Vertical 2. Horizontal middle 3. Horizontal bottom', isParticle: false },
+  { char: 'す', romaji: 'su', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal bottom', isParticle: false },
+  { char: 'せ', romaji: 'se', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'そ', romaji: 'so', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'た', romaji: 'ta', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ち', romaji: 'chi', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'つ', romaji: 'tsu', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal bottom', isParticle: false },
+  { char: 'て', romaji: 'te', group: 'seion', stroke: '1. Horizontal middle 2. Vertical', isParticle: false },
+  { char: 'と', romaji: 'to', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'な', romaji: 'na', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal middle', isParticle: false },
+  { char: 'に', romaji: 'ni', group: 'seion', stroke: '1. Vertical 2. Horizontal', isParticle: false },
+  { char: 'ぬ', romaji: 'nu', group: 'seion', stroke: '1. Horizontal 2. Vertical', isParticle: false },
+  { char: 'ね', romaji: 'ne', group: 'seion', stroke: '1. Horizontal 2. Vertical', isParticle: false },
+  { char: 'の', romaji: 'no', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal middle', isParticle: false },
+  { char: 'は', romaji: 'ha', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal middle', isParticle: true },
+  { char: 'ひ', romaji: 'hi', group: 'seion', stroke: '1. Horizontal middle 2. Vertical', isParticle: false },
+  { char: 'ふ', romaji: 'fu', group: 'seion', stroke: '1. Curve 2. Vertical', isParticle: false },
+  { char: 'へ', romaji: 'he', group: 'seion', stroke: '1. Horizontal middle 2. Vertical', isParticle: true },
+  { char: 'ほ', romaji: 'ho', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal middle', isParticle: true },
+  { char: 'ま', romaji: 'ma', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'み', romaji: 'mi', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'む', romaji: 'mu', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'め', romaji: 'me', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'も', romaji: 'mo', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'や', romaji: 'ya', group: 'seion', stroke: '1. Horizontal 2. Curve', isParticle: true },
+  { char: 'ゆ', romaji: 'yu', group: 'seion', stroke: '1. Horizontal 2. Vertical 3. Curve right', isParticle: true },
+  { char: 'よ', romaji: 'yo', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal middle', isParticle: true },
+  { char: 'ら', romaji: 'ra', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'り', romaji: 'ri', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'る', romaji: 'ru', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'れ', romaji: 're', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ろ', romaji: 'ro', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'わ', romaji: 'wa', group: 'seion', stroke: '1. Horizontal 2. Curve 3. Curve bottom', isParticle: true },
+  { char: 'を', romaji: 'wo', group: 'seion', stroke: '1. Horizontal 2. Vertical', isParticle: true },
+  { char: 'ん', romaji: 'n', group: 'seion', stroke: '1. Vertical 2. Curve', isParticle: true },
+  { char: 'が', romaji: 'ga', group: 'dakuten', stroke: '1. Base か 2. Dakuten', isParticle: false },
+  { char: 'ぎ', romaji: 'gi', group: 'dakuten', stroke: '1. Base き 2. Dakuten', isParticle: false },
+  { char: 'ぐ', romaji: 'gu', group: 'dakuten', stroke: '1. Base く 2. Dakuten', isParticle: false },
+  { char: 'げ', romaji: 'ge', group: 'dakuten', stroke: '1. Base け 2. Dakuten', isParticle: false },
+  { char: 'ご', romaji: 'go', group: 'dakuten', stroke: '1. Base こ 2. Dakuten', isParticle: false },
+  { char: 'ざ', romaji: 'za', group: 'dakuten', stroke: '1. Base さ 2. Dakuten', isParticle: false },
+  { char: 'じ', romaji: 'ji', group: 'dakuten', stroke: '1. Base し 2. Dakuten', isParticle: false },
+  { char: 'ず', romaji: 'zu', group: 'dakuten', stroke: '1. Base す 2. Dakuten', isParticle: false },
+  { char: 'ぜ', romaji: 'ze', group: 'dakuten', stroke: '1. Base せ 2. Dakuten', isParticle: false },
+  { char: 'ぞ', romaji: 'zo', group: 'dakuten', stroke: '1. Base そ 2. Dakuten', isParticle: false },
+  { char: 'だ', romaji: 'da', group: 'dakuten', stroke: '1. Base た 2. Dakuten', isParticle: false },
+  { char: 'ぢ', romaji: 'ji', group: 'dakuten', stroke: '1. Base ち 2. Dakuten', isParticle: false },
+  { char: 'づ', romaji: 'zu', group: 'dakuten', stroke: '1. Base つ 2. Dakuten', isParticle: false },
+  { char: 'で', romaji: 'de', group: 'dakuten', stroke: '1. Base て 2. Dakuten', isParticle: false },
+  { char: 'ど', romaji: 'do', group: 'dakuten', stroke: '1. Base と 2. Dakuten', isParticle: false },
+  { char: 'ば', romaji: 'ba', group: 'dakuten', stroke: '1. Base は 2. Dakuten', isParticle: false },
+  { char: 'び', romaji: 'bi', group: 'dakuten', stroke: '1. Base ひ 2. Dakuten', isParticle: false },
+  { char: 'ぶ', romaji: 'bu', group: 'dakuten', stroke: '1. Base ふ 2. Dakuten', isParticle: false },
+  { char: 'べ', romaji: 'be', group: 'dakuten', stroke: '1. Base へ 2. Dakuten', isParticle: false },
+  { char: 'ぼ', romaji: 'bo', group: 'dakuten', stroke: '1. Base ほ 2. Dakuten', isParticle: false },
+  { char: 'ぱ', romaji: 'pa', group: 'handakuten', stroke: '1. Base は 2. Handakuten', isParticle: false },
+  { char: 'ぴ', romaji: 'pi', group: 'handakuten', stroke: '1. Base ひ 2. Handakuten', isParticle: false },
+  { char: 'ぷ', romaji: 'pu', group: 'handakuten', stroke: '1. Base ふ 2. Handakuten', isParticle: false },
+  { char: 'ぺ', romaji: 'pe', group: 'handakuten', stroke: '1. Base へ 2. Handakuten', isParticle: false },
+  { char: 'ぽ', romaji: 'po', group: 'handakuten', stroke: '1. Base ほ 2. Handakuten', isParticle: false },
+  { char: 'きゃ', romaji: 'kya', group: 'yoon', stroke: '1. Base き 2. Small や', isParticle: false },
+  { char: 'きゅ', romaji: 'kyu', group: 'yoon', stroke: '1. Base き 2. Small ゆ', isParticle: false },
+  { char: 'きょ', romaji: 'kyo', group: 'yoon', stroke: '1. Base き 2. Small よ', isParticle: false },
+  { char: 'しゃ', romaji: 'sha', group: 'yoon', stroke: '1. Base し 2. Small や', isParticle: false },
+  { char: 'しゅ', romaji: 'shu', group: 'yoon', stroke: '1. Base し 2. Small ゆ', isParticle: false },
+  { char: 'しょ', romaji: 'sho', group: 'yoon', stroke: '1. Base し 2. Small よ', isParticle: false },
+  { char: 'ちゃ', romaji: 'cha', group: 'yoon', stroke: '1. Base ち 2. Small や', isParticle: false },
+  { char: 'ちゅ', romaji: 'chu', group: 'yoon', stroke: '1. Base ち 2. Small ゆ', isParticle: false },
+  { char: 'ちょ', romaji: 'cho', group: 'yoon', stroke: '1. Base ち 2. Small よ', isParticle: false },
+  { char: 'にゃ', romaji: 'nya', group: 'yoon', stroke: '1. Base に 2. Small や', isParticle: false },
+  { char: 'にゅ', romaji: 'nyu', group: 'yoon', stroke: '1. Base に 2. Small ゆ', isParticle: false },
+  { char: 'にょ', romaji: 'nyo', group: 'yoon', stroke: '1. Base に 2. Small よ', isParticle: false },
+  { char: 'ひゃ', romaji: 'hya', group: 'yoon', stroke: '1. Base ひ 2. Small や', isParticle: false },
+  { char: 'ひゅ', romaji: 'hyu', group: 'yoon', stroke: '1. Base ひ 2. Small ゆ', isParticle: false },
+  { char: 'ひょ', romaji: 'hyo', group: 'yoon', stroke: '1. Base ひ 2. Small よ', isParticle: false },
+  { char: 'みゃ', romaji: 'mya', group: 'yoon', stroke: '1. Base み 2. Small や', isParticle: false },
+  { char: 'みゅ', romaji: 'myu', group: 'yoon', stroke: '1. Base み 2. Small ゆ', isParticle: false },
+  { char: 'みょ', romaji: 'myo', group: 'yoon', stroke: '1. Base み 2. Small よ', isParticle: false },
+  { char: 'りゃ', romaji: 'rya', group: 'yoon', stroke: '1. Base り 2. Small や', isParticle: false },
+  { char: 'りゅ', romaji: 'ryu', group: 'yoon', stroke: '1. Base り 2. Small ゆ', isParticle: false },
+  { char: 'りょ', romaji: 'ryo', group: 'yoon', stroke: '1. Base り 2. Small よ', isParticle: false },
+  { char: 'ぎゃ', romaji: 'gya', group: 'yoon', stroke: '1. Base ぎ 2. Small や', isParticle: false },
+  { char: 'ぎゅ', romaji: 'gyu', group: 'yoon', stroke: '1. Base ぎ 2. Small ゆ', isParticle: false },
+  { char: 'ぎょ', romaji: 'gyo', group: 'yoon', stroke: '1. Base ぎ 2. Small よ', isParticle: false },
+  { char: 'じゃ', romaji: 'ja', group: 'yoon', stroke: '1. Base じ 2. Small や', isParticle: false },
+  { char: 'じゅ', romaji: 'ju', group: 'yoon', stroke: '1. Base じ 2. Small ゆ', isParticle: false },
+  { char: 'じょ', romaji: 'jo', group: 'yoon', stroke: '1. Base じ 2. Small よ', isParticle: false },
+  { char: 'びゃ', romaji: 'bya', group: 'yoon', stroke: '1. Base び 2. Small や', isParticle: false },
+  { char: 'びゅ', romaji: 'byu', group: 'yoon', stroke: '1. Base び 2. Small ゆ', isParticle: false },
+  { char: 'びょ', romaji: 'byo', group: 'yoon', stroke: '1. Base び 2. Small よ', isParticle: false },
+  { char: 'ぴゃ', romaji: 'pya', group: 'yoon', stroke: '1. Base ぴ 2. Small や', isParticle: false },
+  { char: 'ぴゅ', romaji: 'pyu', group: 'yoon', stroke: '1. Base ぴ 2. Small ゆ', isParticle: false },
+  { char: 'ぴょ', romaji: 'pyo', group: 'yoon', stroke: '1. Base ぴ 2. Small よ', isParticle: false },
 ]
 
 const KATAKANA_CHART: KanaItem[] = [
-  ...['ア','イ','ウ','エ','オ','カ','キ','ク','ケ','コ','サ','シ','ス','セ','ソ','タ','チ','ツ','テ','ト','ナ','ニ','ヌ','ネ','ノ','ハ','ヒ','フ','ヘ','ホ','マ','ミ','ム','メ','モ','ヤ','ユ','ヨ','ラ','リ','ル','レ','ロ','ワ','ヲ','ン'].map((c) => {
-    const map: Record<string, string> = {'ア':'a','イ':'i','ウ':'u','エ':'e','オ':'o','カ':'ka','キ':'ki','ク':'ku','ケ':'ke','コ':'ko','サ':'sa','シ':'shi','ス':'su','セ':'se','ソ':'so','タ':'ta','チ':'chi','ツ':'tsu','テ':'te','ト':'to','ナ':'na','ニ':'ni','ヌ':'nu','ネ':'ne','ノ':'no','ハ':'ha','ヒ':'hi','フ':'fu','ヘ':'he','ホ':'ho','マ':'ma','ミ':'mi','ム':'mu','メ':'me','モ':'mo','ヤ':'ya','ユ':'yu','ヨ':'yo','ラ':'ra','リ':'ri','ル':'ru','レ':'re','ロ':'ro','ワ':'wa','ヲ':'wo','ン':'n'}
-    return { char: c, romaji: map[c], group: 'seion' }
-  }),
-  ...['ガ','ギ','グ','ゲ','ゴ','ザ','ジ','ズ','ゼ','ゾ','ダ','ヂ','ヅ','デ','ド','バ','ビ','ブ','ベ','ボ'].map((c) => {
-    const map: Record<string, string> = {'ガ':'ga','ギ':'gi','グ':'gu','ゲ':'ge','ゴ':'go','ザ':'za','ジ':'ji','ズ':'zu','ゼ':'ze','ゾ':'zo','ダ':'da','ヂ':'ji','ヅ':'zu','デ':'de','ド':'do','バ':'ba','ビ':'bi','ブ':'bu','ベ':'be','ボ':'bo'}
-    return { char: c, romaji: map[c], group: 'dakuten' }
-  }),
-  ...['パ','ピ','プ','ペ','ポ'].map((c) => {
-    const map: Record<string, string> = {'パ':'pa','ピ':'pi','プ':'pu','ペ':'pe','ポ':'po'}
-    return { char: c, romaji: map[c], group: 'handakuten' }
-  }),
-  ...['キャ','キュ','キョ','シャ','シュ','ショ','チャ','チュ','チョ','ニャ','ニュ','ニョ','ヒャ','ヒュ','ヒョ','ミャ','ミュ','ミョ','リャ','リュ','リョ','ギャ','ギュ','ギョ','ジャ','ジュ','ジョ','ビャ','ビュ','ビョ','ピャ','ピュ','ピョ'].map((c) => {
-    const map: Record<string, string> = {'キャ':'kya','キュ':'kyu','キョ':'kyo','シャ':'sha','シュ':'shu','ショ':'sho','チャ':'cha','チュ':'chu','チョ':'cho','ニャ':'nya','ニュ':'nyu','ニョ':'nyo','ヒャ':'hya','ヒュ':'hyu','ヒョ':'hyo','ミャ':'mya','ミュ':'myu','ミョ':'myo','リャ':'rya','リュ':'ryu','リョ':'ryo','ギャ':'gya','ギュ':'gyu','ギョ':'gyo','ジャ':'ja','ジュ':'ju','ジョ':'jo','ビャ':'bya','ビュ':'byu','ビョ':'byo','ピャ':'pya','ピュ':'pyu','ピョ':'pyo'}
-    return { char: c, romaji: map[c], group: 'yoon' }
-  }),
+  { char: 'ア', romaji: 'a', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle', isParticle: false },
+  { char: 'イ', romaji: 'i', group: 'seion', stroke: '1. Vertical 2. Horizontal middle', isParticle: false },
+  { char: 'ウ', romaji: 'u', group: 'seion', stroke: '1. Horizontal top 2. Vertical', isParticle: false },
+  { char: 'エ', romaji: 'e', group: 'seion', stroke: '1. Vertical 2. Horizontal middle', isParticle: false },
+  { char: 'オ', romaji: 'o', group: 'seion', stroke: '1. Horizontal top 2. Vertical', isParticle: false },
+  { char: 'カ', romaji: 'ka', group: 'seion', stroke: '1. Vertical left 2. Vertical right 3. Horizontal', isParticle: false },
+  { char: 'キ', romaji: 'ki', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'ク', romaji: 'ku', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'ケ', romaji: 'ke', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'コ', romaji: 'ko', group: 'seion', stroke: '1. Vertical left 2. Vertical right 3. Horizontal', isParticle: false },
+  { char: 'サ', romaji: 'sa', group: 'seion', stroke: '1. Vertical left 2. Vertical middle 3. Horizontal', isParticle: false },
+  { char: 'シ', romaji: 'shi', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'ス', romaji: 'su', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'セ', romaji: 'se', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'ソ', romaji: 'so', group: 'seion', stroke: '1. Vertical left 2. Vertical middle 3. Horizontal', isParticle: false },
+  { char: 'タ', romaji: 'ta', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'チ', romaji: 'chi', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ツ', romaji: 'tsu', group: 'seion', stroke: '1. Horizontal top 2. Vertical', isParticle: false },
+  { char: 'テ', romaji: 'te', group: 'seion', stroke: '1. Horizontal top 2. Vertical', isParticle: false },
+  { char: 'ト', romaji: 'to', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ナ', romaji: 'na', group: 'seion', stroke: '1. Vertical 2. Horizontal', isParticle: false },
+  { char: 'ニ', romaji: 'ni', group: 'seion', stroke: '1. Vertical 2. Horizontal', isParticle: false },
+  { char: 'ヌ', romaji: 'nu', group: 'seion', stroke: '1. Vertical 2. Horizontal', isParticle: false },
+  { char: 'ネ', romaji: 'ne', group: 'seion', stroke: '1. Vertical 2. Horizontal', isParticle: false },
+  { char: 'ノ', romaji: 'no', group: 'seion', stroke: '1. Vertical 2. Horizontal', isParticle: false },
+  { char: 'ハ', romaji: 'ha', group: 'seion', stroke: '1. Vertical left 2. Vertical right 3. Horizontal', isParticle: false },
+  { char: 'ヒ', romaji: 'hi', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'フ', romaji: 'fu', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: false },
+  { char: 'ヘ', romaji: 'he', group: 'seion', stroke: '1. Vertical left 2. Vertical right', isParticle: true },
+  { char: 'ホ', romaji: 'ho', group: 'seion', stroke: '1. Vertical left 2. Vertical right 3. Horizontal', isParticle: true },
+  { char: 'マ', romaji: 'ma', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ミ', romaji: 'mi', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ム', romaji: 'mu', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'メ', romaji: 'me', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'モ', romaji: 'mo', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ヤ', romaji: 'ya', group: 'seion', stroke: '1. Horizontal 2. Curve', isParticle: true },
+  { char: 'ユ', romaji: 'yu', group: 'seion', stroke: '1. Horizontal 2. Vertical 3. Curve right', isParticle: true },
+  { char: 'ヨ', romaji: 'yo', group: 'seion', stroke: '1. Horizontal top 2. Vertical 3. Horizontal middle', isParticle: true },
+  { char: 'ラ', romaji: 'ra', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'リ', romaji: 'ri', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ル', romaji: 'ru', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'レ', romaji: 're', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ロ', romaji: 'ro', group: 'seion', stroke: '1. Horizontal top 2. Horizontal middle 3. Vertical', isParticle: false },
+  { char: 'ワ', romaji: 'wa', group: 'seion', stroke: '1. Horizontal 2. Vertical 3. Curve', isParticle: true },
+  { char: 'ヲ', romaji: 'wo', group: 'seion', stroke: '1. Horizontal 2. Vertical', isParticle: true },
+  { char: 'ン', romaji: 'n', group: 'seion', stroke: '1. Vertical 2. Curve', isParticle: true },
+  { char: 'ガ', romaji: 'ga', group: 'dakuten', stroke: '1. Base カ 2. Dakuten', isParticle: false },
+  { char: 'ギ', romaji: 'gi', group: 'dakuten', stroke: '1. Base キ 2. Dakuten', isParticle: false },
+  { char: 'グ', romaji: 'gu', group: 'dakuten', stroke: '1. Base ク 2. Dakuten', isParticle: false },
+  { char: 'ゲ', romaji: 'ge', group: 'dakuten', stroke: '1. Base ケ 2. Dakuten', isParticle: false },
+  { char: 'ゴ', romaji: 'go', group: 'dakuten', stroke: '1. Base コ 2. Dakuten', isParticle: false },
+  { char: 'ザ', romaji: 'za', group: 'dakuten', stroke: '1. Base サ 2. Dakuten', isParticle: false },
+  { char: 'ジ', romaji: 'ji', group: 'dakuten', stroke: '1. Base シ 2. Dakuten', isParticle: false },
+  { char: 'ズ', romaji: 'zu', group: 'dakuten', stroke: '1. Base ス 2. Dakuten', isParticle: false },
+  { char: 'ゼ', romaji: 'ze', group: 'dakuten', stroke: '1. Base セ 2. Dakuten', isParticle: false },
+  { char: 'ゾ', romaji: 'zo', group: 'dakuten', stroke: '1. Base ソ 2. Dakuten', isParticle: false },
+  { char: 'ダ', romaji: 'da', group: 'dakuten', stroke: '1. Base タ 2. Dakuten', isParticle: false },
+  { char: 'ヂ', romaji: 'ji', group: 'dakuten', stroke: '1. Base チ 2. Dakuten', isParticle: false },
+  { char: 'ヅ', romaji: 'zu', group: 'dakuten', stroke: '1. Base ツ 2. Dakuten', isParticle: false },
+  { char: 'デ', romaji: 'de', group: 'dakuten', stroke: '1. Base テ 2. Dakuten', isParticle: false },
+  { char: 'ド', romaji: 'do', group: 'dakuten', stroke: '1. Base ト 2. Dakuten', isParticle: false },
+  { char: 'バ', romaji: 'ba', group: 'dakuten', stroke: '1. Base ハ 2. Dakuten', isParticle: false },
+  { char: 'ビ', romaji: 'bi', group: 'dakuten', stroke: '1. Base ヒ 2. Dakuten', isParticle: false },
+  { char: 'ブ', romaji: 'bu', group: 'dakuten', stroke: '1. Base フ 2. Dakuten', isParticle: false },
+  { char: 'ベ', romaji: 'be', group: 'dakuten', stroke: '1. Base ヘ 2. Dakuten', isParticle: false },
+  { char: 'ボ', romaji: 'bo', group: 'dakuten', stroke: '1. Base ホ 2. Dakuten', isParticle: false },
+  { char: 'パ', romaji: 'pa', group: 'handakuten', stroke: '1. Base ハ 2. Handakuten', isParticle: false },
+  { char: 'ピ', romaji: 'pi', group: 'handakuten', stroke: '1. Base ヒ 2. Handakuten', isParticle: false },
+  { char: 'プ', romaji: 'pu', group: 'handakuten', stroke: '1. Base フ 2. Handakuten', isParticle: false },
+  { char: 'ペ', romaji: 'pe', group: 'handakuten', stroke: '1. Base ヘ 2. Handakuten', isParticle: false },
+  { char: 'ポ', romaji: 'po', group: 'handakuten', stroke: '1. Base ホ 2. Handakuten', isParticle: false },
+  { char: 'キャ', romaji: 'kya', group: 'yoon', stroke: '1. Base キ 2. Small ャ', isParticle: false },
+  { char: 'キュ', romaji: 'kyu', group: 'yoon', stroke: '1. Base キ 2. Small ュ', isParticle: false },
+  { char: 'キョ', romaji: 'kyo', group: 'yoon', stroke: '1. Base キ 2. Small ョ', isParticle: false },
+  { char: 'シャ', romaji: 'sha', group: 'yoon', stroke: '1. Base シ 2. Small ャ', isParticle: false },
+  { char: 'シュ', romaji: 'shu', group: 'yoon', stroke: '1. Base シ 2. Small ュ', isParticle: false },
+  { char: 'ショ', romaji: 'sho', group: 'yoon', stroke: '1. Base シ 2. Small ョ', isParticle: false },
+  { char: 'チャ', romaji: 'cha', group: 'yoon', stroke: '1. Base チ 2. Small ャ', isParticle: false },
+  { char: 'チュ', romaji: 'chu', group: 'yoon', stroke: '1. Base チ 2. Small ュ', isParticle: false },
+  { char: 'チョ', romaji: 'cho', group: 'yoon', stroke: '1. Base チ 2. Small ョ', isParticle: false },
+  { char: 'ニャ', romaji: 'nya', group: 'yoon', stroke: '1. Base ニ 2. Small ャ', isParticle: false },
+  { char: 'ニュ', romaji: 'nyu', group: 'yoon', stroke: '1. Base ニ 2. Small ュ', isParticle: false },
+  { char: 'ニョ', romaji: 'nyo', group: 'yoon', stroke: '1. Base ニ 2. Small ョ', isParticle: false },
+  { char: 'ヒャ', romaji: 'hya', group: 'yoon', stroke: '1. Base ヒ 2. Small ャ', isParticle: false },
+  { char: 'ヒュ', romaji: 'hyu', group: 'yoon', stroke: '1. Base ヒ 2. Small ュ', isParticle: false },
+  { char: 'ヒョ', romaji: 'hyo', group: 'yoon', stroke: '1. Base ヒ 2. Small ョ', isParticle: false },
+  { char: 'ミャ', romaji: 'mya', group: 'yoon', stroke: '1. Base ミ 2. Small ャ', isParticle: false },
+  { char: 'ミュ', romaji: 'myu', group: 'yoon', stroke: '1. Base ミ 2. Small ュ', isParticle: false },
+  { char: 'ミョ', romaji: 'myo', group: 'yoon', stroke: '1. Base ミ 2. Small ョ', isParticle: false },
+  { char: 'リャ', romaji: 'rya', group: 'yoon', stroke: '1. Base リ 2. Small ャ', isParticle: false },
+  { char: 'リュ', romaji: 'ryu', group: 'yoon', stroke: '1. Base リ 2. Small ュ', isParticle: false },
+  { char: 'リョ', romaji: 'ryo', group: 'yoon', stroke: '1. Base リ 2. Small ョ', isParticle: false },
+  { char: 'ギャ', romaji: 'gya', group: 'yoon', stroke: '1. Base ギ 2. Small ャ', isParticle: false },
+  { char: 'ギュ', romaji: 'gyu', group: 'yoon', stroke: '1. Base ギ 2. Small ュ', isParticle: false },
+  { char: 'ギョ', romaji: 'gyo', group: 'yoon', stroke: '1. Base ギ 2. Small ョ', isParticle: false },
+  { char: 'ジャ', romaji: 'ja', group: 'yoon', stroke: '1. Base ジ 2. Small ャ', isParticle: false },
+  { char: 'ジュ', romaji: 'ju', group: 'yoon', stroke: '1. Base ジ 2. Small ュ', isParticle: false },
+  { char: 'ジョ', romaji: 'jo', group: 'yoon', stroke: '1. Base ジ 2. Small ョ', isParticle: false },
+  { char: 'ビャ', romaji: 'bya', group: 'yoon', stroke: '1. Base ビ 2. Small ャ', isParticle: false },
+  { char: 'ビュ', romaji: 'byu', group: 'yoon', stroke: '1. Base ビ 2. Small ュ', isParticle: false },
+  { char: 'ビョ', romaji: 'byo', group: 'yoon', stroke: '1. Base ビ 2. Small ョ', isParticle: false },
+  { char: 'ピャ', romaji: 'pya', group: 'yoon', stroke: '1. Base ピ 2. Small ャ', isParticle: false },
+  { char: 'ピュ', romaji: 'pyu', group: 'yoon', stroke: '1. Base ピ 2. Small ュ', isParticle: false },
+  { char: 'ピョ', romaji: 'pyo', group: 'yoon', stroke: '1. Base ピ 2. Small ョ', isParticle: false },
 ]
 
 const FLASHCARDS: Record<FlashcardCategory, Flashcard[]> = {
@@ -103,6 +279,701 @@ const CATEGORY_LABELS: Record<FlashcardCategory, string> = {
 }
 
 type ViewMode = 'chart' | 'practice'
+
+interface StrokePath {
+  d: string
+  label: string
+}
+
+const STROKE_DATA: Record<string, StrokePath[]> = {
+  'あ': [
+    { d: 'M 25 40 Q 50 25 75 40 Q 80 55 65 65 Q 50 72 35 62 Q 20 52 25 40', label: 'Curve left' },
+    { d: 'M 60 28 L 60 72', label: 'Vertical right' }
+  ],
+  'い': [
+    { d: 'M 60 25 L 60 75', label: 'Vertical' },
+    { d: 'M 30 50 Q 60 38 85 50', label: 'Curve right' }
+  ],
+  'う': [
+    { d: 'M 25 50 L 75 50', label: 'Horizontal' },
+    { d: 'M 50 25 L 50 75', label: 'Vertical' }
+  ],
+  'え': [
+    { d: 'M 50 25 L 50 75', label: 'Vertical' },
+    { d: 'M 25 50 L 75 50', label: 'Horizontal' }
+  ],
+  'お': [
+    { d: 'M 30 42 Q 50 28 70 42 Q 78 58 60 68 Q 45 75 30 62 Q 22 50 30 42', label: 'Curve outer' },
+    { d: 'M 50 32 L 50 70', label: 'Vertical inner' }
+  ],
+  'か': [
+    { d: 'M 25 50 L 75 50', label: 'Horizontal' },
+    { d: 'M 50 25 L 50 75', label: 'Vertical' },
+    { d: 'M 50 68 L 75 50', label: 'Hook right' }
+  ],
+  'き': [
+    { d: 'M 25 50 L 75 50', label: 'Horizontal' },
+    { d: 'M 50 25 L 50 75', label: 'Vertical' }
+  ],
+  'く': [
+    { d: 'M 28 48 Q 50 32 72 48', label: 'Curve top' },
+    { d: 'M 50 32 L 50 68', label: 'Vertical bottom' }
+  ],
+  'け': [
+    { d: 'M 25 50 L 75 50', label: 'Horizontal' },
+    { d: 'M 50 25 L 50 75', label: 'Vertical' }
+  ],
+  'こ': [
+    { d: 'M 32 45 Q 50 32 68 45 Q 75 58 60 63 Q 45 66 32 52 Q 28 48 32 45', label: 'Curve circle' },
+    { d: 'M 50 32 L 50 68', label: 'Vertical inner' }
+  ],
+  'さ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'し': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' }
+  ],
+  'す': [
+    { d: 'M 25 38 L 75 38', label: 'H' },
+    { d: 'M 50 38 L 50 75', label: 'V' },
+    { d: 'M 25 58 L 75 58', label: 'H2' }
+  ],
+  'せ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'そ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'た': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'ち': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'つ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' }
+  ],
+  'て': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' }
+  ],
+  'と': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'な': [
+    { d: 'M 25 35 L 75 35', label: 'H' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' }
+  ],
+  'に': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 50 L 75 50', label: 'H' }
+  ],
+  'ぬ': [
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' }
+  ],
+  'ね': [
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' }
+  ],
+  'の': [
+    { d: 'M 25 35 L 75 35', label: 'H' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' }
+  ],
+  'は': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' }
+  ],
+  'ひ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' }
+  ],
+  'ふ': [
+    { d: 'M 30 45 Q 50 30 70 45 Q 75 60 55 65 Q 40 68 30 55 Q 25 48 30 45', label: 'Curve' },
+    { d: 'M 50 32 L 50 68', label: 'Vertical' }
+  ],
+  'へ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' }
+  ],
+  'ほ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' }
+  ],
+  'ま': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'み': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'む': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'め': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'も': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'や': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 Q 72 55 50 75', label: 'Curve' }
+  ],
+  'ゆ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 50 55 Q 72 32 85 55', label: 'Curve right' }
+  ],
+  'よ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' }
+  ],
+  'ら': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'り': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'る': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'れ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'ろ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' }
+  ],
+  'わ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 Q 72 55 50 75', label: 'Curve' },
+    { d: 'M 50 55 Q 30 72 50 88', label: 'Curve2' }
+  ],
+  'を': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' }
+  ],
+  'ん': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 30 75 Q 50 58 70 75', label: 'Curve' }
+  ],
+  'が': [
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぎ': [
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぐ': [
+    { d: 'M 28 48 Q 50 32 72 48', label: 'Curve' },
+    { d: 'M 50 32 L 50 68', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'げ': [
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ご': [
+    { d: 'M 32 42 Q 50 28 68 42 Q 75 58 60 65 Q 45 72 30 60 Q 22 48 32 42', label: 'Curve' },
+    { d: 'M 50 32 L 50 70', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ざ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'じ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ず': [
+    { d: 'M 25 38 L 75 38', label: 'H' },
+    { d: 'M 50 38 L 50 75', label: 'V' },
+    { d: 'M 25 58 L 75 58', label: 'H2' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぜ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぞ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'だ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぢ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'づ': [
+    { d: 'M 25 38 L 75 38', label: 'H' },
+    { d: 'M 50 38 L 50 75', label: 'V' },
+    { d: 'M 25 58 L 75 58', label: 'H2' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'で': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ど': [
+    { d: 'M 32 42 Q 50 28 68 42 Q 75 58 60 65 Q 45 72 30 60 Q 22 48 32 42', label: 'Curve' },
+    { d: 'M 50 32 L 50 70', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ば': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'び': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぶ': [
+    { d: 'M 28 48 Q 50 32 72 48', label: 'Curve' },
+    { d: 'M 50 32 L 50 68', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'べ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぼ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' }
+  ],
+  'ぱ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' }
+  ],
+  'ぴ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' }
+  ],
+  'ぷ': [
+    { d: 'M 28 48 Q 50 32 72 48', label: 'Curve' },
+    { d: 'M 50 32 L 50 68', label: 'V' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' }
+  ],
+  'ぺ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' }
+  ],
+  'ぽ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' }
+  ],
+  'きゃ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'きゅ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'きょ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'しゃ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'しゅ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'しょ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'ちゃ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'ちゅ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'ちょ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'にゃ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'にゅ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'にょ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 50 L 75 50', label: 'H' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'ひゃ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'ひゅ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'ひょ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'みゃ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'みゅ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'みょ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'りゃ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'りゅ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'りょ': [
+    { d: 'M 25 35 L 75 35', label: 'H1' },
+    { d: 'M 25 55 L 75 55', label: 'H2' },
+    { d: 'M 50 35 L 50 75', label: 'V' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'ぎゃ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'ぎゅ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'ぎょ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'じゃ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'じゅ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'じょ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 25 45 L 75 45', label: 'H1' },
+    { d: 'M 25 65 L 75 65', label: 'H2' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'びゃ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'びゅ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'びょ': [
+    { d: 'M 25 55 L 75 55', label: 'H' },
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 20 32 L 35 25', label: 'D1' },
+    { d: 'M 35 32 L 50 25', label: 'D2' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ],
+  'ぴゃ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 30 50 L 70 50', label: 'H' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' },
+    { d: 'M 25 80 Q 42 70 58 80 T 82 80', label: 'Small ya' }
+  ],
+  'ぴゅ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 30 50 L 70 50', label: 'H' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' },
+    { d: 'M 50 80 Q 68 58 82 80', label: 'Small yu' }
+  ],
+  'ぴょ': [
+    { d: 'M 50 25 L 50 75', label: 'V' },
+    { d: 'M 30 50 L 70 50', label: 'H' },
+    { d: 'M 25 28 L 35 22', label: 'HD1' },
+    { d: 'M 35 28 L 45 22', label: 'HD2' },
+    { d: 'M 25 80 L 75 80', label: 'Small yo' }
+  ]
+}
+
+function getStrokes(char: string): StrokePath[] {
+  return STROKE_DATA[char] || []
+}
+
+
+
+interface KakijunAnimationProps {
+  strokes: StrokePath[]
+  char: string
+  romaji: string
+}
+
+function KakijunAnimation({ strokes }: KakijunAnimationProps) {
+  const [currentStroke, setCurrentStroke] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+
+  const playAnimation = () => {
+    setCurrentStroke(0)
+    setIsPlaying(true)
+    setShowAll(false)
+  }
+
+  const revealAll = () => {
+    setShowAll(true)
+    setIsPlaying(false)
+  }
+
+  const reset = () => {
+    setCurrentStroke(0)
+    setIsPlaying(false)
+    setShowAll(false)
+  }
+
+  useEffect(() => {
+    if (!isPlaying || currentStroke >= strokes.length) {
+      if (currentStroke >= strokes.length) {
+        setIsPlaying(false)
+      }
+      return
+    }
+    const timer = setTimeout(() => {
+      setCurrentStroke((s) => s + 1)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [isPlaying, currentStroke, strokes.length])
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative w-32 h-32 sm:w-40 sm:h-40">
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          <rect x="1" y="1" width="98" height="98" fill="none" stroke="#d6c2c4" strokeWidth="1" rx="4" />
+          {strokes.map((stroke, idx) => {
+            const isVisible = showAll || idx < currentStroke
+            return (
+              <path
+                key={idx}
+                d={stroke.d}
+                fill="none"
+                stroke={isVisible ? '#864e5a' : '#d1e4fb'}
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  transition: 'stroke 0.3s ease',
+                  opacity: isVisible ? 1 : 0.4,
+                }}
+              />
+            )
+          })}
+        </svg>
+        <div className="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-1 rounded-full border border-outline-variant">
+          <span className="font-label-caps text-label-caps text-on-surface-variant">
+            {showAll ? strokes.length : currentStroke}/{strokes.length}
+          </span>
+        </div>
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={playAnimation}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-container/20 text-primary font-label-caps text-label-caps hover:bg-primary-container/40 transition-colors squish-click"
+        >
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+            play_arrow
+          </span>
+          <span>Putar</span>
+        </button>
+        <button
+          onClick={revealAll}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface font-label-caps text-label-caps hover:bg-surface-container-highest/50 transition-colors squish-click"
+        >
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+            visibility
+          </span>
+          <span>Lihat Semua</span>
+        </button>
+        <button
+          onClick={reset}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface font-label-caps text-label-caps hover:bg-surface-container-highest/50 transition-colors squish-click"
+        >
+          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+            refresh
+          </span>
+          <span>Ulangi</span>
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function FlashcardPractice({ category = 'kana-hiragana' }: { category?: FlashcardCategory }) {
   const navigate = useNavigate()
@@ -224,40 +1095,42 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
           </button>
 
         </div>
+        <BottomNavBar active="practice" />
         {selectedChar && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={() => setSelectedChar(null)}>
-            <div className="bg-surface rounded-2xl p-6 shadow-xl max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
-              <div className="text-center mb-4">
-                <span className="font-display-jp text-display-jp text-on-surface text-6xl">
+          <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', backgroundColor: 'rgba(0,0,0,0.6)' }} onClick={() => setSelectedChar(null)}>
+            <div style={{ backgroundColor: '#f7f9ff', borderRadius: '16px', padding: '24px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxWidth: '384px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                <span style={{ fontFamily: '"Noto Sans JP"', fontSize: '48px', fontWeight: 700, color: '#091d2e' }}>
                   {selectedChar.char}
                 </span>
-                <span className="font-label-caps text-label-caps text-primary text-xl font-bold mt-2 block">
+                <span style={{ fontFamily: 'Inter', fontSize: '20px', fontWeight: 700, color: '#864e5a', marginTop: '8px', display: 'block' }}>
                   {selectedChar.romaji}
                 </span>
                 {selectedChar.isParticle && (
-                  <span className="inline-block mt-2 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-semibold">
+                  <span style={{ display: 'inline-block', marginTop: '8px', padding: '4px 12px', borderRadius: '9999px', backgroundColor: '#df2842', color: '#fffbff', fontSize: '12px', fontWeight: 600 }}>
                     Partikel
                   </span>
                 )}
               </div>
-              <div className="bg-surface-container-lowest rounded-xl p-4 mb-4">
-                <h4 className="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider mb-2 text-xs">
+              <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+                <h4 style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#514345', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
                   Cara Penulisan (Kakijun)
                 </h4>
-                <p className="text-on-surface text-sm leading-relaxed">
-                  {selectedChar.stroke}
-                </p>
+                <KakijunAnimation
+                  strokes={getStrokes(selectedChar.char)}
+                  char={selectedChar.char}
+                  romaji={selectedChar.romaji}
+                />
               </div>
               <button
                 onClick={() => setSelectedChar(null)}
-                className="w-full bg-primary text-on-primary font-bold py-3 rounded-xl active:scale-95 transition-transform squishy-btn"
+                style={{ width: '100%', backgroundColor: '#864e5a', color: '#ffffff', fontWeight: 700, padding: '12px', borderRadius: '12px', border: 'none', cursor: 'pointer' }}
               >
                 Tutup
               </button>
             </div>
           </div>
         )}
-        <BottomNavBar active="practice" />
       </>
     )
   }
