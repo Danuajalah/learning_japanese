@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopAppBar, BottomNavBar, DesktopNav } from '@/components'
 
@@ -285,26 +285,81 @@ interface StrokePath {
   label: string
 }
 
+const ARROW_MARKER = `
+  <defs>
+    <marker
+      id="arrowhead"
+      markerWidth="10"
+      markerHeight="7"
+      refX="9"
+      refY="3.5"
+      orient="auto"
+    >
+      <polygon points="0 0, 10 3.5, 0 7" fill="#864e5a" />
+    </marker>
+  </defs>
+`
+
+function KakijunImage({ strokes }: { strokes: StrokePath[] }) {
+  const total = strokes.length
+
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative w-40 h-40">
+        <svg viewBox="0 0 100 100" className="w-full h-full">
+          {ARROW_MARKER}
+          <rect x="1" y="1" width="98" height="98" fill="none" stroke="#d6c2c4" strokeWidth="1" rx="4" />
+          {strokes.map((stroke, idx) => (
+            <g key={idx}>
+              <path
+                d={stroke.d}
+                fill="none"
+                stroke="#864e5a"
+                strokeWidth="6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                markerEnd="url(#arrowhead)"
+              />
+              <text
+                x="12"
+                y="14"
+                fontSize="10"
+                fontWeight="700"
+                fill="#864e5a"
+              >
+                {idx + 1}
+              </text>
+            </g>
+          ))}
+        </svg>
+      </div>
+      <p className="text-xs text-center text-on-surface-variant font-body-sm">
+        {total} stroke{total !== 1 ? 's' : ''}
+      </p>
+    </div>
+  )
+}
+
 const STROKE_DATA: Record<string, StrokePath[]> = {
   'あ': [
-    { d: 'M 25 40 Q 50 25 75 40 Q 80 55 65 65 Q 50 72 35 62 Q 20 52 25 40', label: 'Curve left' },
-    { d: 'M 60 28 L 60 72', label: 'Vertical right' }
+    { d: 'M 25 40 Q 50 25 75 40 Q 80 55 65 65 Q 50 72 35 62 Q 20 52 25 40', label: '1' },
+    { d: 'M 60 28 L 60 72', label: '2' }
   ],
   'い': [
-    { d: 'M 60 25 L 60 75', label: 'Vertical' },
-    { d: 'M 30 50 Q 60 38 85 50', label: 'Curve right' }
+    { d: 'M 60 25 L 60 75', label: '1' },
+    { d: 'M 30 50 Q 60 38 85 50', label: '2' }
   ],
   'う': [
-    { d: 'M 25 50 L 75 50', label: 'Horizontal' },
-    { d: 'M 50 25 L 50 75', label: 'Vertical' }
+    { d: 'M 25 50 L 75 50', label: '1' },
+    { d: 'M 50 25 L 50 75', label: '2' }
   ],
   'え': [
-    { d: 'M 50 25 L 50 75', label: 'Vertical' },
-    { d: 'M 25 50 L 75 50', label: 'Horizontal' }
+    { d: 'M 50 25 L 50 75', label: '1' },
+    { d: 'M 25 50 L 75 50', label: '2' }
   ],
   'お': [
-    { d: 'M 30 42 Q 50 28 70 42 Q 78 58 60 68 Q 45 75 30 62 Q 22 50 30 42', label: 'Curve outer' },
-    { d: 'M 50 32 L 50 70', label: 'Vertical inner' }
+    { d: 'M 30 42 Q 50 28 70 42 Q 78 58 60 68 Q 45 75 30 62 Q 22 50 30 42', label: '1' },
+    { d: 'M 50 32 L 50 70', label: '2' }
   ],
   'か': [
     { d: 'M 25 50 L 75 50', label: 'Horizontal' },
@@ -869,112 +924,6 @@ function getStrokes(char: string): StrokePath[] {
   return STROKE_DATA[char] || []
 }
 
-
-
-interface KakijunAnimationProps {
-  strokes: StrokePath[]
-  char: string
-  romaji: string
-}
-
-function KakijunAnimation({ strokes }: KakijunAnimationProps) {
-  const [currentStroke, setCurrentStroke] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [showAll, setShowAll] = useState(false)
-
-  const playAnimation = () => {
-    setCurrentStroke(0)
-    setIsPlaying(true)
-    setShowAll(false)
-  }
-
-  const revealAll = () => {
-    setShowAll(true)
-    setIsPlaying(false)
-  }
-
-  const reset = () => {
-    setCurrentStroke(0)
-    setIsPlaying(false)
-    setShowAll(false)
-  }
-
-  useEffect(() => {
-    if (!isPlaying || currentStroke >= strokes.length) {
-      if (currentStroke >= strokes.length) {
-        setIsPlaying(false)
-      }
-      return
-    }
-    const timer = setTimeout(() => {
-      setCurrentStroke((s) => s + 1)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [isPlaying, currentStroke, strokes.length])
-
-  return (
-    <div className="flex flex-col items-center gap-3">
-      <div className="relative w-32 h-32 sm:w-40 sm:h-40">
-        <svg viewBox="0 0 100 100" className="w-full h-full">
-          <rect x="1" y="1" width="98" height="98" fill="none" stroke="#d6c2c4" strokeWidth="1" rx="4" />
-          {strokes.map((stroke, idx) => {
-            const isVisible = showAll || idx < currentStroke
-            return (
-              <path
-                key={idx}
-                d={stroke.d}
-                fill="none"
-                stroke={isVisible ? '#864e5a' : '#d1e4fb'}
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{
-                  transition: 'stroke 0.3s ease',
-                  opacity: isVisible ? 1 : 0.4,
-                }}
-              />
-            )
-          })}
-        </svg>
-        <div className="absolute top-2 right-2 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-1 rounded-full border border-outline-variant">
-          <span className="font-label-caps text-label-caps text-on-surface-variant">
-            {showAll ? strokes.length : currentStroke}/{strokes.length}
-          </span>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <button
-          onClick={playAnimation}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary-container/20 text-primary font-label-caps text-label-caps hover:bg-primary-container/40 transition-colors squish-click"
-        >
-          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-            play_arrow
-          </span>
-          <span>Putar</span>
-        </button>
-        <button
-          onClick={revealAll}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface font-label-caps text-label-caps hover:bg-surface-container-highest/50 transition-colors squish-click"
-        >
-          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-            visibility
-          </span>
-          <span>Lihat Semua</span>
-        </button>
-        <button
-          onClick={reset}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-high text-on-surface font-label-caps text-label-caps hover:bg-surface-container-highest/50 transition-colors squish-click"
-        >
-          <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
-            refresh
-          </span>
-          <span>Ulangi</span>
-        </button>
-      </div>
-    </div>
-  )
-}
-
 export default function FlashcardPractice({ category = 'kana-hiragana' }: { category?: FlashcardCategory }) {
   const navigate = useNavigate()
   const [viewMode, setViewMode] = useState<ViewMode>('chart')
@@ -1116,11 +1065,14 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
                 <h4 style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#514345', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>
                   Cara Penulisan (Kakijun)
                 </h4>
-                <KakijunAnimation
+                <KakijunImage
                   strokes={getStrokes(selectedChar.char)}
-                  char={selectedChar.char}
-                  romaji={selectedChar.romaji}
                 />
+                {selectedChar.stroke && (
+                  <p style={{ marginTop: '10px', fontSize: '13px', color: '#514345', lineHeight: '1.6' }}>
+                    {selectedChar.stroke}
+                  </p>
+                )}
               </div>
               <button
                 onClick={() => setSelectedChar(null)}
