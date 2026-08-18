@@ -301,29 +301,46 @@ const ARROW_MARKER = `
   </defs>
 `
 
+function getCoordinates(dString){
+  const match = dString.match(/^M\s*([\d.]+)[,\s]+([\d.]+)/);
+
+  if(match){
+    const x = parseFloat(match[1]) - 5;
+    const y = parseFloat(match[2]) - 5;
+
+    return {x: x,y: y};
+  }
+
+  return {x: 10, y: 10};
+}
+
 function KakijunImage({ strokes }: { strokes: StrokePath[] }) {
   const total = strokes.length
 
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative w-40 h-40">
-        <svg viewBox="0 0 100 100" className="w-full h-full">
+        <svg viewBox="0 0 109 109" width="100%" height="100%">
           {ARROW_MARKER}
           <rect x="1" y="1" width="98" height="98" fill="none" stroke="#d6c2c4" strokeWidth="1" rx="4" />
-          {strokes.map((stroke, idx) => (
+          {strokes.map((stroke, idx) => {
+          
+            const startCoor = getCoordinates(stroke.d);
+
+          return (
             <g key={idx}>
               <path
                 d={stroke.d}
                 fill="none"
                 stroke="#864e5a"
-                strokeWidth="6"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 markerEnd="url(#arrowhead)"
               />
               <text
-                x="12"
-                y="14"
+                x={startCoor.x}
+                y={startCoor.y}
                 fontSize="10"
                 fontWeight="700"
                 fill="#864e5a"
@@ -331,7 +348,8 @@ function KakijunImage({ strokes }: { strokes: StrokePath[] }) {
                 {stroke.label}
               </text>
             </g>
-          ))}
+          );
+          })}
         </svg>
       </div>
       <p className="text-xs text-center text-on-surface-variant font-body-sm">
@@ -441,7 +459,7 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
                           {item.isParticle && (
                             <span className="font-label-caps text-label-caps text-[10px] text-secondary mb-0.5">partikel</span>
                           )}
-                          <span className="font-display-jp text-display-jp text-on-surface text-2xl sm:text-3xl">
+                          <span className="font-display-jp text-display-jp text-on-surface">
                             {item.char}
                           </span>
                           <span className="font-label-caps text-label-caps text-on-surface-variant text-xs mt-1">
