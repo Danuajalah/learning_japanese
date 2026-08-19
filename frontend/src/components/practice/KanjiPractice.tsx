@@ -26,7 +26,11 @@ const KANJI_LIST: Kanji[] = [
   { id: 'k10', character: '字', meaning: 'Character, Letter', onyomi: ['ジ'], kunyomi: ['あざな'], strokes: 8, example: 'もじ (character)', level: 3 },
 ]
 
-export default function KanjiPractice() {
+export interface KanjiProps {
+  onBack?: () => void
+}
+
+export default function KanjiPractice({ onBack }: KanjiProps) {
   const navigate = useNavigate()
   const [kanjiList] = useState<Kanji[]>(KANJI_LIST.filter((k) => k.strokes > 0))
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -203,7 +207,11 @@ export default function KanjiPractice() {
   }
 
   const handleBack = () => {
-    navigate('/practice')
+    if (onBack) {
+      onBack()
+    } else {
+      navigate('/practice')
+    }
   }
 
   if (completed) {

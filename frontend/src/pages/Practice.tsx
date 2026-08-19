@@ -30,11 +30,11 @@ export default function Practice() {
   }
 
   if (selectedMode === 'flashcard') {
-    return <FlashcardPractice category={selectedCategory} />
+    return <FlashcardPractice category={selectedCategory} onBack={() => setSelectedMode('hub')} />
   }
 
   if (selectedMode === 'kanji') {
-    return <KanjiPractice />
+    return <KanjiPractice onBack={() => setSelectedMode('hub')} />
   }
 
   if (loading) {

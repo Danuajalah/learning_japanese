@@ -364,7 +364,7 @@ function getStrokes(char: string): StrokePath[] {
   return STROKE_DATA[char] || []
 }
 
-export default function FlashcardPractice({ category = 'kana-hiragana' }: { category?: FlashcardCategory }) {
+export default function FlashcardPractice({ category = 'kana-hiragana', onBack }: { category?: FlashcardCategory; onBack?: () => void }) {
   const navigate = useNavigate()
   const [viewMode, setViewMode] = useState<ViewMode>('chart')
   const [cards] = useState<Flashcard[]>(FLASHCARDS[category])
@@ -408,7 +408,11 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
   }
 
   const handleBack = () => {
-    navigate('/practice')
+    if (onBack) {
+      onBack()
+    } else {
+      navigate('/practice')
+    }
   }
 
   const progress = ((currentIndex + 1) / cards.length) * 100
