@@ -113,7 +113,8 @@ class LessonController extends Controller
     {
         $userId = $request->attributes->get('supabase_user_id');
         $request->validate([
-            'xp_earned' => 'required|integer|min:0',
+            'correct_count' => 'required|integer|min:0',
+            'total_questions' => 'required|integer|min:1',
         ]);
 
         try {
@@ -133,12 +134,33 @@ class LessonController extends Controller
             }
 
             $now = now();
-            $xpEarned = (int) $request->input('xp_earned');
+            $correctCount = (int) $request->input('correct_count');
+            $totalQuestions = (int) $request->input('total_questions');
+            $passingScore = (int) ($lesson->passing_score ?? 70);
+            $scorePercentage = $totalQuestions > 0 ? ($correctCount / $totalQuestions) * 100 : 0;
+            $passed = $scorePercentage >= $passingScore;
+
+            $baseXp = (int) ($lesson->xp_reward ?? 50);
+            $xpEarned = 0;
+
+            if ($passed) {
+                $xpEarned = (int) round($baseXp * ($correctCount / $totalQuestions));
+                if ($correctCount === $totalQuestions && $totalQuestions > 0) {
+                    $xpEarned = (int) round($xpEarned * 1.2);
+                }
+            }
 
             $existing = DB::table('user_progress')
                 ->where('user_id', $userId)
                 ->where('lesson_id', $lessonId)
                 ->first();
+
+            $existingXp = $existing ? (int) $existing->xp : 0;
+            $totalXp = DB::table('user_progress')
+                ->where('user_id', $userId)
+                ->sum('xp') - $existingXp + $xpEarned;
+
+            $level = (int) ceil($totalXp / 100.0);
 
             if ($existing) {
                 DB::table('user_progress')
@@ -146,8 +168,8 @@ class LessonController extends Controller
                     ->where('lesson_id', $lessonId)
                     ->update([
                         'xp' => $xpEarned,
-                        'level' => 1,
-                        'total_xp' => $xpEarned,
+                        'level' => $level,
+                        'total_xp' => $totalXp,
                         'streak' => 1,
                         'last_completed_at' => $now,
                         'updated_at' => $now,
@@ -158,10 +180,38 @@ class LessonController extends Controller
                     'user_id' => $userId,
                     'lesson_id' => $lessonId,
                     'xp' => $xpEarned,
-                    'level' => 1,
-                    'total_xp' => $xpEarned,
+                    'level' => $level,
+                    'total_xp' => $totalXp,
                     'streak' => 1,
                     'last_completed_at' => $now,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
+            }
+
+            $today = $now->toDateString();
+            $dailyGoal = DB::table('daily_goals')
+                ->where('user_id', $userId)
+                ->where('date', $today)
+                ->first();
+
+            if ($dailyGoal) {
+                DB::table('daily_goals')
+                    ->where('user_id', $userId)
+                    ->where('date', $today)
+                    ->update([
+                        'completed' => DB::raw('completed + 1'),
+                        'xp' => DB::raw('xp + ' . $xpEarned),
+                        'updated_at' => $now,
+                    ]);
+            } else {
+                DB::table('daily_goals')->insert([
+                    'id' => \Illuminate\Support\Str::uuid(),
+                    'user_id' => $userId,
+                    'completed' => 1,
+                    'total' => 5,
+                    'xp' => $xpEarned,
+                    'date' => $today,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);
@@ -170,6 +220,12 @@ class LessonController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Lesson completed successfully',
+                'data' => [
+                    'xp_earned' => $xpEarned,
+                    'passed' => $passed,
+                    'total_xp' => $totalXp,
+                    'level' => $level,
+                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Complete lesson failed', [

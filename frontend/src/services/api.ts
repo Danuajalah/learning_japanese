@@ -97,11 +97,11 @@ export class LearningService {
     }
   }
 
-  static async updateLessonProgress(lessonId: string, xpEarned: number): Promise<boolean> {
+  static async updateLessonProgress(lessonId: string, correctCount: number, totalQuestions: number): Promise<boolean> {
     try {
       const res = await apiFetch(`/lessons/${lessonId}/complete`, {
         method: 'POST',
-        body: JSON.stringify({ xp_earned: xpEarned }),
+        body: JSON.stringify({ correct_count: correctCount, total_questions: totalQuestions }),
       })
       return res.success
     } catch {

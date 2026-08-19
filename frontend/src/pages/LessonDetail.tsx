@@ -93,9 +93,9 @@ export default function LessonDetail() {
         const total = lesson.questions.length
         const score = total > 0 ? Math.round((correctCount / total) * 100) : 0
         const passed = score >= (lesson.passing_score || 70)
-
-        if (passed) {
-          LearningService.updateLessonProgress(lesson.id, lesson.xp_reward)
+        let xpEarned = passed ? Math.round((lesson.xp_reward || 50) * (correctCount / total)) : 0
+        if (passed && correctCount === total && total > 0) {
+          xpEarned = Math.round(xpEarned * 1.2)
         }
 
         setResult({
@@ -103,7 +103,7 @@ export default function LessonDetail() {
           score,
           correct_count: correctCount,
           total_questions: total,
-          xp_earned: passed ? lesson.xp_reward : 0,
+          xp_earned: xpEarned,
           passed,
           message: passed
             ? 'Bagus! Anda lulus dengan skor ' + score + '%'
@@ -115,8 +115,8 @@ export default function LessonDetail() {
   }
 
   const handleComplete = async () => {
-    if (!lesson) return
-    await LearningService.updateLessonProgress(lesson.id, lesson.xp_reward)
+    if (!lesson || !result) return
+    await LearningService.updateLessonProgress(lesson.id, result.correct_count, result.total_questions)
     if (lesson.unit_number === 1) {
       setShowContinuePopup(true)
     } else {
