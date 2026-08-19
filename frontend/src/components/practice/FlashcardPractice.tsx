@@ -290,18 +290,18 @@ const ARROW_MARKER = `
   <defs>
     <marker
       id="arrowhead"
-      markerWidth="10"
-      markerHeight="7"
-      refX="9"
-      refY="3.5"
+      markerWidth="40"
+      markerHeight="28"
+      refX="36"
+      refY="14"
       orient="auto"
     >
-      <polygon points="0 0, 10 3.5, 0 7" fill="#864e5a" />
+      <polygon points="0 0, 40 14, 0 28" fill="#864e5a" />
     </marker>
   </defs>
 `
 
-function getCoordinates(dString){
+function getCoordinates(dString: string){
   const match = dString.match(/^M\s*([\d.]+)[,\s]+([\d.]+)/);
 
   if(match){
@@ -319,36 +319,35 @@ function KakijunImage({ strokes }: { strokes: StrokePath[] }) {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="relative w-40 h-40">
-        <svg viewBox="0 0 109 109" width="100%" height="100%">
+      <div className="relative w-48 h-48">
+        <svg viewBox="0 0 1000 1000" width="100%" height="100%">
           {ARROW_MARKER}
-          <rect x="1" y="1" width="98" height="98" fill="none" stroke="#d6c2c4" strokeWidth="1" rx="4" />
+          <rect x="1" y="1" width="998" height="998" fill="none" stroke="#d6c2c4" strokeWidth="2" rx="24" />
           {strokes.map((stroke, idx) => {
-          
             const startCoor = getCoordinates(stroke.d);
 
-          return (
-            <g key={idx}>
-              <path
-                d={stroke.d}
-                fill="none"
-                stroke="#864e5a"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                markerEnd="url(#arrowhead)"
-              />
-              <text
-                x={startCoor.x}
-                y={startCoor.y}
-                fontSize="10"
-                fontWeight="700"
-                fill="#864e5a"
-              >
-                {stroke.label}
-              </text>
-            </g>
-          );
+            return (
+              <g key={idx}>
+                <path
+                  d={stroke.d}
+                  fill="none"
+                  stroke="#864e5a"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  markerEnd="url(#arrowhead)"
+                />
+                <text
+                  x={startCoor.x}
+                  y={startCoor.y}
+                  fontSize="40"
+                  fontWeight="700"
+                  fill="#864e5a"
+                >
+                  {stroke.label}
+                </text>
+              </g>
+            );
           })}
         </svg>
       </div>
@@ -561,7 +560,7 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
           </div>
 
           <div
-            className="w-full aspect-[3/4] sm:aspect-square relative perspective-1000 mb-8 cursor-pointer"
+            className="w-full aspect-3/4 sm:aspect-square relative perspective-1000 mb-8 cursor-pointer"
             onClick={handleFlip}
           >
             <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm rotate-3 scale-95 translate-y-2 z-0" />
@@ -580,7 +579,7 @@ export default function FlashcardPractice({ category = 'kana-hiragana' }: { cate
                     <span className="font-label-caps text-label-caps text-on-surface-variant">Tap to flip</span>
                   </div>
                 </div>
-                <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-surface-container-lowest to-surface-container">
+                <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-linear-to-br from-surface-container-lowest to-surface-container">
                   <span className="text-sm font-label-caps text-label-caps text-primary mb-1">
                     {card.backHint}
                   </span>
