@@ -26,10 +26,16 @@ class LessonController extends Controller
         try {
             $lessons = Lesson::orderBy('unit_number', 'asc')->get();
 
-            if ($userId) {
+            if ($userId && $this->supabase->isConfigured()) {
+                $progressResponse = $this->supabase->get('user_progress', [
+                    'user_id' => 'eq.' . $userId,
+                ], true);
+
                 $progressMap = [];
-                foreach (DB::table('user_progress')->where('user_id', $userId)->get() as $p) {
-                    $progressMap[$p->lesson_id] = $p;
+                if ($progressResponse->successful() && $progressResponse->json()) {
+                    foreach ($progressResponse->json() as $p) {
+                        $progressMap[$p['lesson_id']] = $p;
+                    }
                 }
 
                 foreach ($lessons as $lesson) {
@@ -77,14 +83,19 @@ class LessonController extends Controller
 
             $userId = $request->attributes->get('supabase_user_id');
 
-            if ($userId && $lesson->unit_number > 1) {
+            if ($userId && $lesson->unit_number > 1 && $this->supabase->isConfigured()) {
                 $prevLesson = Lesson::where('unit_number', $lesson->unit_number - 1)->first();
 
                 if ($prevLesson) {
-                    $prevCompleted = DB::table('user_progress')
-                        ->where('user_id', $userId)
-                        ->where('lesson_id', $prevLesson->id)
-                        ->exists();
+                    $prevCompleted = false;
+                    $prevProgressResponse = $this->supabase->get('user_progress', [
+                        'user_id' => 'eq.' . $userId,
+                        'lesson_id' => 'eq.' . $prevLesson->id,
+                    ], true);
+
+                    if ($prevProgressResponse->successful() && $prevProgressResponse->json()) {
+                        $prevCompleted = true;
+                    }
 
                     if (!$prevCompleted) {
                         return response()->json([
@@ -150,71 +161,90 @@ class LessonController extends Controller
                 }
             }
 
-            $existing = DB::table('user_progress')
-                ->where('user_id', $userId)
-                ->where('lesson_id', $lessonId)
-                ->first();
+            if (!$this->supabase->isConfigured()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Supabase not configured',
+                ], 500);
+            }
 
-            $existingXp = $existing ? (int) $existing->xp : 0;
-            $totalXp = DB::table('user_progress')
-                ->where('user_id', $userId)
-                ->sum('xp') - $existingXp + $xpEarned;
+            $existingResponse = $this->supabase->get('user_progress', [
+                'user_id' => 'eq.' . $userId,
+                'lesson_id' => 'eq.' . $lessonId,
+            ], true);
 
+            $existingXp = 0;
+            $existingId = null;
+            if ($existingResponse->successful() && $existingResponse->json()) {
+                $existingXp = (int) ($existingResponse->json()[0]['xp'] ?? 0);
+                $existingId = $existingResponse->json()[0]['id'];
+            }
+
+            $allProgressResponse = $this->supabase->get('user_progress', [
+                'user_id' => 'eq.' . $userId,
+            ], true);
+
+            $allXp = 0;
+            if ($allProgressResponse->successful()) {
+                foreach ($allProgressResponse->json() as $p) {
+                    $allXp += (int) ($p['xp'] ?? 0);
+                }
+            }
+            $totalXp = $allXp - $existingXp + $xpEarned;
             $level = (int) ceil($totalXp / 100.0);
 
-            if ($existing) {
-                DB::table('user_progress')
-                    ->where('user_id', $userId)
-                    ->where('lesson_id', $lessonId)
-                    ->update([
-                        'xp' => $xpEarned,
-                        'level' => $level,
-                        'total_xp' => $totalXp,
-                        'streak' => 1,
-                        'last_completed_at' => $now,
-                        'updated_at' => $now,
-                    ]);
+            $nowIso = $now->toIso8601String();
+            $data = [
+                'user_id' => $userId,
+                'lesson_id' => $lessonId,
+                'xp' => $xpEarned,
+                'level' => $level,
+                'total_xp' => $totalXp,
+                'streak' => 1,
+                'last_completed_at' => $nowIso,
+                'updated_at' => $nowIso,
+            ];
+
+            if ($existingId) {
+                $saveResponse = $this->supabase->patch('user_progress', $existingId, $data, true);
             } else {
-                DB::table('user_progress')->insert([
-                    'id' => \Illuminate\Support\Str::uuid(),
-                    'user_id' => $userId,
-                    'lesson_id' => $lessonId,
-                    'xp' => $xpEarned,
-                    'level' => $level,
-                    'total_xp' => $totalXp,
-                    'streak' => 1,
-                    'last_completed_at' => $now,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
+                $data['created_at'] = $nowIso;
+                $saveResponse = $this->supabase->post('user_progress', $data, true);
+            }
+
+            if ($saveResponse->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to save progress: ' . $saveResponse->body(),
+                ], 500);
             }
 
             $today = $now->toDateString();
-            $dailyGoal = DB::table('daily_goals')
-                ->where('user_id', $userId)
-                ->where('date', $today)
-                ->first();
+            $dailyGoalResponse = $this->supabase->get('daily_goals', [
+                'user_id' => 'eq.' . $userId,
+                'date' => 'eq.' . $today,
+            ], true);
 
-            if ($dailyGoal) {
-                DB::table('daily_goals')
-                    ->where('user_id', $userId)
-                    ->where('date', $today)
-                    ->update([
-                        'completed' => DB::raw('completed + 1'),
-                        'xp' => DB::raw('xp + ' . $xpEarned),
-                        'updated_at' => $now,
-                    ]);
+            if ($dailyGoalResponse->successful() && !empty($dailyGoalResponse->json())) {
+                $currentGoal = $dailyGoalResponse->json()[0];
+                $newCompleted = (int) ($currentGoal['completed'] ?? 0) + 1;
+                $newXp = (int) ($currentGoal['xp'] ?? 0) + $xpEarned;
+                $goalId = $currentGoal['id'];
+                $this->supabase->patch('daily_goals', $goalId, [
+                    'completed' => $newCompleted,
+                    'xp' => $newXp,
+                    'updated_at' => $nowIso,
+                ], true);
             } else {
-                DB::table('daily_goals')->insert([
-                    'id' => \Illuminate\Support\Str::uuid(),
+                $this->supabase->post('daily_goals', [
                     'user_id' => $userId,
                     'completed' => 1,
                     'total' => 5,
                     'xp' => $xpEarned,
                     'date' => $today,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ]);
+                    'created_at' => $nowIso,
+                    'updated_at' => $nowIso,
+                ], true);
             }
 
             return response()->json([
@@ -259,14 +289,19 @@ class LessonController extends Controller
                 ], 404);
             }
 
-            if ($userId && $lesson->unit_number > 1) {
+            if ($userId && $lesson->unit_number > 1 && $this->supabase->isConfigured()) {
                 $prevLesson = Lesson::where('unit_number', $lesson->unit_number - 1)->first();
 
                 if ($prevLesson) {
-                    $prevCompleted = DB::table('user_progress')
-                        ->where('user_id', $userId)
-                        ->where('lesson_id', $prevLesson->id)
-                        ->exists();
+                    $prevCompleted = false;
+                    $prevProgressResponse = $this->supabase->get('user_progress', [
+                        'user_id' => 'eq.' . $userId,
+                        'lesson_id' => 'eq.' . $prevLesson->id,
+                    ], true);
+
+                    if ($prevProgressResponse->successful() && $prevProgressResponse->json()) {
+                        $prevCompleted = true;
+                    }
 
                     if (!$prevCompleted) {
                         return response()->json([
