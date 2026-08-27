@@ -41,6 +41,8 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   const [feedbackType, setFeedbackType] = useState<'correct' | 'incorrect'>('correct')
   const [showAnswer, setShowAnswer] = useState(false)
   const [completed, setCompleted] = useState(false)
+  const [flipped, setFlipped] = useState(false)
+  const [view, setView] = useState<'card' | 'practice'>('card')
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -54,6 +56,9 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   useEffect(() => {
     setTotalStrokes(strokeCount)
     setCurrentStroke(1)
+    setView('card')
+    setFlipped(false)
+    setShowAnswer(false)
     resetCanvas()
   }, [currentIndex, strokeCount])
 
@@ -214,6 +219,127 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
     }
   }
 
+  const renderCardView = () => (
+    <div className="mb-6 w-full">
+      <div className={`w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-pointer`} onClick={() => setFlipped(!flipped)}>
+        <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm rotate-3 scale-95 translate-y-2 z-0" />
+        <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm -rotate-2 scale-[0.98] translate-y-1 z-0" />
+        <div className={`flip-card w-full h-full relative z-10 ${flipped ? 'flipped' : ''}`}>
+          <div className="flip-card-inner w-full h-full relative rounded-3xl shadow-[0_8px_24px_rgba(134,78,90,0.1)] transition-transform duration-500">
+            <div className="flip-card-front absolute inset-0 bg-surface-container-lowest border border-outline-variant/50 rounded-3xl flex flex-col items-center justify-center p-8">
+              <span className="font-display-jp text-display-jp text-on-surface mb-4">
+                {kanji.character}
+              </span>
+              <div className="absolute bottom-6 flex flex-col items-center opacity-60">
+                <span className="material-symbols-outlined mb-1">touch_app</span>
+                <span className="font-label-caps text-label-caps text-on-surface-variant">Tap to flip</span>
+              </div>
+            </div>
+            <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-linear-to-br from-surface-container-lowest to-surface-container">
+              <span className="text-sm font-label-caps text-label-caps text-primary mb-1">
+                {kanji.meaning}
+              </span>
+              <div className="w-full text-left mt-4 space-y-3">
+                <div>
+                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Onyomi</span>
+                  <p className="font-display-jp text-display-jp text-on-surface text-2xl">
+                    {kanji.onyomi.join('、')}
+                  </p>
+                </div>
+                <div>
+                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Kunyomi</span>
+                  <p className="font-display-jp text-display-jp text-on-surface text-2xl">
+                    {kanji.kunyomi.join('、')}
+                  </p>
+                </div>
+                <div>
+                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Example</span>
+                  <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+                    {kanji.example}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 flex justify-center">
+        <button
+          onClick={() => setView('practice')}
+          className="bg-secondary text-white font-bold py-4 px-8 rounded-xl shadow-lg active:scale-95 transition-transform squishy-btn flex items-center justify-center gap-2"
+        >
+          <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
+            brush
+          </span>
+          <span>Mulai Latihan Menulis</span>
+        </button>
+      </div>
+    </div>
+  )
+
+  const renderPracticeView = () => (
+    <div className="w-full">
+      <div className="relative w-full aspect-square max-w-[320px] bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_8px_16px_rgba(134,78,90,0.05)] overflow-hidden">
+        <div className="absolute inset-0 genkouyoushi-grid pointer-events-none opacity-50" />
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+          <span
+            className="font-display-jp text-[200px] text-surface-container-high leading-none font-bold opacity-30"
+            style={{ fontSize: '200px' }}
+          >
+            {kanji.character}
+          </span>
+        </div>
+        <div className="absolute top-4 left-4 bg-surface-container-lowest/80 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant flex items-center gap-2">
+          <span className="font-label-caps text-label-caps text-on-surface-variant">Stroke</span>
+          <span className="font-body-md text-body-md font-bold text-primary" id="strokeCounter">
+            {currentStroke} / {strokeCount}
+          </span>
+        </div>
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full cursor-crosshair"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+      </div>
+
+      {showFeedback && (
+        <div
+          className={`absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300`}
+          style={{
+            backgroundColor: feedbackType === 'correct' ? '#dcf5e5' : '#ffebee',
+            color: feedbackType === 'correct' ? '#1c7c34' : '#b71c1c',
+            borderWidth: '2px',
+            borderStyle: 'solid',
+            borderColor: feedbackType === 'correct' ? '#4caf50' : '#f44336',
+            animation: 'pulse 1s ease-in-out 3',
+          }}
+        >
+          <span className="material-symbols-outlined">
+            {feedbackType === 'correct' ? 'check_circle' : 'error'}
+          </span>
+          <span className="font-body-md font-semibold">
+            {feedbackType === 'correct'
+              ? 'Bagus! Urutan benar.'
+              : 'Coba lagi, urutan salah.'}
+          </span>
+        </div>
+      )}
+
+      <div className="mt-8 text-center text-on-surface-variant text-sm font-label-caps flex items-center gap-2">
+        <span className="material-symbols-outlined text-sm">history</span>
+        <span>
+          Next kanji: {kanjiList[currentIndex + 1]?.character || '完成！'}
+        </span>
+      </div>
+    </div>
+  )
+
   if (completed) {
     return (
       <>
@@ -256,119 +382,75 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
           <div className="flex items-center gap-4">
-            <span className="font-label-caps text-label-caps text-on-surface-variant hidden sm:block">
-              {currentStroke} / {strokeCount} Strokes
-            </span>
-            <div className="w-24 sm:w-32 h-2 bg-surface-container-highest rounded-full overflow-hidden">
-              <div
-                className="h-full bg-primary rounded-full transition-all duration-300"
-                style={{ width: `${(currentStroke / strokeCount) * 100}%` }}
-              />
-            </div>
+            {view === 'practice' && (
+              <>
+                <span className="font-label-caps text-label-caps text-on-surface-variant hidden sm:block">
+                  {currentStroke} / {strokeCount} Strokes
+                </span>
+                <div className="w-24 sm:w-32 h-2 bg-surface-container-highest rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-primary rounded-full transition-all duration-300"
+                    style={{ width: `${(currentStroke / strokeCount) * 100}%` }}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
 
         <main className="flex-1 flex flex-col items-center justify-center px-container-margin relative w-full max-w-lg mx-auto">
-          <div className="mb-6 text-center">
-            <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold">
-              {kanji.character}
-            </h2>
-            <p className="text-on-surface-variant font-label-caps text-label-caps mt-1">
-              {kanji.meaning}
-            </p>
-          </div>
-
-          <div className="relative w-full aspect-square max-w-[320px] bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_8px_16px_rgba(134,78,90,0.05)] overflow-hidden">
-            <div className="absolute inset-0 genkouyoushi-grid pointer-events-none opacity-50" />
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-              <span
-                className="font-display-jp text-[200px] text-surface-container-high leading-none font-bold opacity-30"
-                style={{ fontSize: '200px' }}
-              >
-                {kanji.character}
-              </span>
-            </div>
-            <div className="absolute top-4 left-4 bg-surface-container-lowest/80 backdrop-blur-sm px-3 py-1 rounded-full border border-outline-variant flex items-center gap-2">
-              <span className="font-label-caps text-label-caps text-on-surface-variant">Stroke</span>
-              <span className="font-body-md text-body-md font-bold text-primary" id="strokeCounter">
-                {currentStroke} / {strokeCount}
-              </span>
-            </div>
-            <canvas
-              ref={canvasRef}
-              className="absolute inset-0 w-full h-full cursor-crosshair"
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={stopDrawing}
-              onMouseLeave={stopDrawing}
-              onTouchStart={startDrawing}
-              onTouchMove={draw}
-              onTouchEnd={stopDrawing}
-            />
-          </div>
-
-          {showFeedback && (
-            <div
-              className={`absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 px-6 py-3 rounded-full shadow-lg flex items-center gap-2 transition-all duration-300`}
-              style={{
-                backgroundColor: feedbackType === 'correct' ? '#dcf5e5' : '#ffebee',
-                color: feedbackType === 'correct' ? '#1c7c34' : '#b71c1c',
-                borderWidth: '2px',
-                borderStyle: 'solid',
-                borderColor: feedbackType === 'correct' ? '#4caf50' : '#f44336',
-                animation: 'pulse 1s ease-in-out 3',
-              }}
-            >
-              <span className="material-symbols-outlined">
-                {feedbackType === 'correct' ? 'check_circle' : 'error'}
-              </span>
-              <span className="font-body-md font-semibold">
-                {feedbackType === 'correct'
-                  ? 'Bagus! Urutan benar.'
-                  : 'Coba lagi, urutan salah.'}
-              </span>
-            </div>
-          )}
-
-          <div className="mt-8 text-center text-on-surface-variant text-sm font-label-caps flex items-center gap-2">
-            <span className="material-symbols-outlined text-sm">history</span>
-            <span>
-              Next kanji: {kanjiList[currentIndex + 1]?.character || '完成！'}
-            </span>
-          </div>
+          {view === 'card' ? renderCardView() : renderPracticeView()}
         </main>
 
         <div className="w-full px-container-margin pb-safe pt-4 flex justify-center gap-4 max-w-lg mx-auto">
-          <button
-            onClick={handleClear}
-            className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary p-3 rounded-xl hover:bg-surface-container active:scale-95 transition-all w-24 button-squish"
-            id="btnClear"
-          >
-            <span className="material-symbols-outlined mb-1" style={{ fontSize: '24px' }}>
-              ink_eraser
-            </span>
-            <span className="font-label-caps text-label-caps">Hapus</span>
-          </button>
-          <button
-            onClick={handleExample}
-            className="flex-1 btn-tactile bg-primary-container text-on-primary-container rounded-xl py-3 px-6 flex items-center justify-center gap-2 font-bold font-body-md"
-            id="btnCheck"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>
-              play_circle
-            </span>
-            <span>Contoh</span>
-          </button>
-          <button
-            onClick={handleCheck}
-            className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary p-3 rounded-xl hover:bg-surface-container active:scale-95 transition-all w-24 button-squish"
-            id="btnCheckResult"
-          >
-            <span className="material-symbols-outlined mb-1" style={{ fontSize: '24px' }}>
-              done_all
-            </span>
-            <span className="font-label-caps text-label-caps">Cek</span>
-          </button>
+          {view === 'practice' && (
+            <button
+              onClick={() => { setView('card'); setShowAnswer(false); }}
+              className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary p-3 rounded-xl hover:bg-surface-container active:scale-95 transition-all w-24 button-squish"
+              id="btnBackToCard"
+            >
+              <span className="material-symbols-outlined mb-1" style={{ fontSize: '24px' }}>
+                arrow_back
+              </span>
+              <span className="font-label-caps text-label-caps">Kembali</span>
+            </button>
+          )}
+          {view === 'practice' && (
+            <button
+              onClick={handleClear}
+              className="flex flex-col items-center justify-center text-on-surface-variant hover:text-secondary p-3 rounded-xl hover:bg-surface-container active:scale-95 transition-all w-24 button-squish"
+              id="btnClear"
+            >
+              <span className="material-symbols-outlined mb-1" style={{ fontSize: '24px' }}>
+                ink_eraser
+              </span>
+              <span className="font-label-caps text-label-caps">Hapus</span>
+            </button>
+          )}
+          {view === 'practice' && (
+            <button
+              onClick={handleExample}
+              className="flex-1 btn-tactile bg-primary-container text-on-primary-container rounded-xl py-3 px-6 flex items-center justify-center gap-2 font-bold font-body-md"
+              id="btnCheck"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>
+                play_circle
+              </span>
+              <span>Contoh</span>
+            </button>
+          )}
+          {view === 'practice' && (
+            <button
+              onClick={handleCheck}
+              className="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary p-3 rounded-xl hover:bg-surface-container active:scale-95 transition-all w-24 button-squish"
+              id="btnCheckResult"
+            >
+              <span className="material-symbols-outlined mb-1" style={{ fontSize: '24px' }}>
+                done_all
+              </span>
+              <span className="font-label-caps text-label-caps">Cek</span>
+            </button>
+          )}
         </div>
       </div>
       <BottomNavBar active="practice" />
