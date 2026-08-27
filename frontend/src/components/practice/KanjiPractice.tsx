@@ -64,6 +64,10 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   const [completed, setCompleted] = useState(false)
   const [flipped, setFlipped] = useState(false)
   const [view, setView] = useState<'card' | 'practice'>('card')
+  const [swipeX, setSwipeX] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartX = useRef(0)
+  const dragCurrentX = useRef(0)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -246,6 +250,45 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
     }
   }
 
+  const handleDragStart = (clientX: number) => {
+    dragStartX.current = clientX
+    dragCurrentX.current = clientX
+    setIsDragging(true)
+  }
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDragging) return
+    dragCurrentX.current = clientX
+    setSwipeX(dragCurrentX.current - dragStartX.current)
+  }
+
+  const handleDragEnd = () => {
+    if (!isDragging) return
+    const delta = dragCurrentX.current - dragStartX.current
+    const threshold = 80
+
+    if (delta < -threshold && currentIndex < filteredKanji.length - 1) {
+      setCurrentIndex((i) => i + 1)
+    } else if (delta > threshold && currentIndex > 0) {
+      setCurrentIndex((i) => i - 1)
+    }
+
+    setIsDragging(false)
+    setSwipeX(0)
+  }
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    handleDragStart(e.clientX)
+  }
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    handleDragMove(e.clientX)
+  }
+
+  const onPointerUp = () => {
+    handleDragEnd()
+  }
+
   const renderCardView = () => (
     <div className="mb-6 w-full space-y-4">
       <div className="flex justify-center gap-2">
@@ -264,67 +307,67 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
         ))}
       </div>
 
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-          disabled={currentIndex === 0}
-          className="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant disabled:opacity-30 squish-click"
+      <div
+        className="w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-grab active:cursor-grabbing select-none"
+        style={{ touchAction: 'none' }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerLeave={onPointerUp}
+      >
+        <div
+          className="w-full h-full transition-transform duration-300 ease-out"
+          style={{ transform: `translateX(${swipeX}px) rotate(${swipeX * 0.05}deg)` }}
         >
-          <span className="material-symbols-outlined">arrow_back</span>
-        </button>
-        <span className="font-label-caps text-label-caps text-on-surface-variant">
-          {currentIndex + 1} / {filteredKanji.length}
-        </span>
-        <button
-          onClick={() => setCurrentIndex((i) => Math.min(filteredKanji.length - 1, i + 1))}
-          disabled={currentIndex === filteredKanji.length - 1}
-          className="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant disabled:opacity-30 squish-click"
-        >
-          <span className="material-symbols-outlined">arrow_forward</span>
-        </button>
-      </div>
-
-      <div className={`w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-pointer`} onClick={() => setFlipped(!flipped)}>
-        <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm rotate-3 scale-95 translate-y-2 z-0" />
-        <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm -rotate-2 scale-[0.98] translate-y-1 z-0" />
-        <div className={`flip-card w-full h-full relative z-10 ${flipped ? 'flipped' : ''}`}>
-          <div className="flip-card-inner w-full h-full relative rounded-3xl shadow-[0_8px_24px_rgba(134,78,90,0.1)] transition-transform duration-500">
-            <div className="flip-card-front absolute inset-0 bg-surface-container-lowest border border-outline-variant/50 rounded-3xl flex flex-col items-center justify-center p-8">
-              <span className="font-display-jp text-display-jp text-on-surface mb-4">
-                {kanji.character}
-              </span>
-              <div className="absolute bottom-6 flex flex-col items-center opacity-60">
-                <span className="material-symbols-outlined mb-1">touch_app</span>
-                <span className="font-label-caps text-label-caps text-on-surface-variant">Tap to flip</span>
-              </div>
-            </div>
-            <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-linear-to-br from-surface-container-lowest to-surface-container">
-              <span className="text-sm font-label-caps text-label-caps text-primary mb-1">
-                {kanji.meaning}
-              </span>
-              <div className="w-full text-left mt-4 space-y-3">
-                <div>
-                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Onyomi</span>
-                  <p className="font-display-jp text-display-jp text-on-surface text-2xl">
-                    {kanji.onyomi.join('、')}
-                  </p>
+          <div className={`w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-pointer`} onClick={() => setFlipped(!flipped)}>
+            <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm rotate-3 scale-95 translate-y-2 z-0" />
+            <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm -rotate-2 scale-[0.98] translate-y-1 z-0" />
+            <div className={`flip-card w-full h-full relative z-10 ${flipped ? 'flipped' : ''}`}>
+              <div className="flip-card-inner w-full h-full relative rounded-3xl shadow-[0_8px_24px_rgba(134,78,90,0.1)] transition-transform duration-500">
+                <div className="flip-card-front absolute inset-0 bg-surface-container-lowest border border-outline-variant/50 rounded-3xl flex flex-col items-center justify-center p-8">
+                  <span className="font-display-jp text-display-jp text-on-surface mb-4">
+                    {kanji.character}
+                  </span>
+                  <div className="absolute bottom-6 flex flex-col items-center opacity-60">
+                    <span className="material-symbols-outlined mb-1">touch_app</span>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant">Tap to flip</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Kunyomi</span>
-                  <p className="font-display-jp text-display-jp text-on-surface text-2xl">
-                    {kanji.kunyomi.join('、')}
-                  </p>
-                </div>
-                <div>
-                  <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Example</span>
-                  <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                    {kanji.example}
-                  </p>
+                <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-linear-to-br from-surface-container-lowest to-surface-container">
+                  <span className="text-sm font-label-caps text-label-caps text-primary mb-1">
+                    {kanji.meaning}
+                  </span>
+                  <div className="w-full text-left mt-4 space-y-3">
+                    <div>
+                      <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Onyomi</span>
+                      <p className="font-display-jp text-display-jp text-on-surface text-2xl">
+                        {kanji.onyomi.join('、')}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Kunyomi</span>
+                      <p className="font-display-jp text-display-jp text-on-surface text-2xl">
+                        {kanji.kunyomi.join('、')}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Example</span>
+                      <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+                        {kanji.example}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-center">
+        <span className="font-label-caps text-label-caps text-on-surface-variant">
+          {currentIndex + 1} / {filteredKanji.length}
+        </span>
       </div>
       <div className="mt-6 flex justify-center">
         <button
