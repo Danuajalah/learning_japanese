@@ -10,20 +10,40 @@ export interface Kanji {
   kunyomi: string[]
   strokes: number
   example: string
-  level: number
+  level: 'N5' | 'N4' | 'N3'
 }
 
 const KANJI_LIST: Kanji[] = [
-  { id: 'k1', character: '学', meaning: 'Study, Learning', onyomi: ['ガク'], kunyomi: ['まなぶ'], strokes: 8, example: 'がくせい (student)', level: 1 },
-  { id: 'k2', character: '生', meaning: 'Life, Birth', onyomi: ['セイ'], kunyomi: ['なまび', 'いきる'], strokes: 5, example: 'せんせい (teacher)', level: 1 },
-  { id: 'k3', character: '日', meaning: 'Sun, Day', onyomi: ['ニチ'], kunyomi: ['ひ', 'か'], strokes: 4, example: 'ひづき (anomaly)', level: 1 },
-  { id: 'k4', character: '本', meaning: 'Book, Origin', onyomi: ['ホン'], kunyomi: ['もと'], strokes: 6, example: 'ほん (book)', level: 1 },
-  { id: 'k5', character: '学', meaning: 'Study, Learning', onyomi: ['ガク'], kunyomi: ['まなぶ'], strokes: 8, example: 'がっかう (school)', level: 2 },
-  { id: 'k6', character: '先', meaning: 'Before, Ahead', onyomi: ['セン'], kunyomi: ['さき'], strokes: 6, example: 'せんせい (teacher)', level: 2 },
-  { id: 'k7', character: '生', meaning: 'Life, Birth', onyomi: ['セイ'], kunyomi: ['なまび', 'いきる'], strokes: 5, example: 'せいかん (growth)', level: 2 },
-  { id: 'k8', character: '大学', meaning: 'University', onyomi: ['ダイガク'], kunyomi: [], strokes: 0, example: 'だいがく (university)', level: 3 },
-  { id: 'k9', character: '漢', meaning: 'China, Kanji', onyomi: ['カン'], kunyomi: ['かんじ'], strokes: 11, example: 'かんじ (kanji)', level: 3 },
-  { id: 'k10', character: '字', meaning: 'Character, Letter', onyomi: ['ジ'], kunyomi: ['あざな'], strokes: 8, example: 'もじ (character)', level: 3 },
+  { id: 'k1', character: '学', meaning: 'Study, Learning', onyomi: ['ガク'], kunyomi: ['まなぶ'], strokes: 8, example: 'がくせい (student)', level: 'N5' },
+  { id: 'k2', character: '生', meaning: 'Life, Birth', onyomi: ['セイ'], kunyomi: ['なま、い、なま'], strokes: 5, example: 'せんせい (teacher)', level: 'N5' },
+  { id: 'k3', character: '日', meaning: 'Sun, Day', onyomi: ['ニチ'], kunyomi: ['ひ、か'], strokes: 4, example: 'にちようび (Sunday)', level: 'N5' },
+  { id: 'k4', character: '本', meaning: 'Book, Origin', onyomi: ['ホン'], kunyomi: ['もと'], strokes: 6, example: 'ほん (book)', level: 'N5' },
+  { id: 'k5', character: '月', meaning: 'Moon, Month', onyomi: ['ゲツ'], kunyomi: ['つき'], strokes: 4, example: 'げつようび (Monday)', level: 'N5' },
+  { id: 'k6', character: '火', meaning: 'Fire', onyomi: ['カ'], kunyomi: ['ひ、ほ'], strokes: 4, example: 'かようび (Tuesday)', level: 'N5' },
+  { id: 'k7', character: '水', meaning: 'Water', onyomi: ['スイ'], kunyomi: ['みず'], strokes: 4, example: 'みず (water)', level: 'N5' },
+  { id: 'k8', character: '木', meaning: 'Tree, Wood', onyomi: ['モク'], kunyomi: ['き、こ'], strokes: 4, example: 'もくようび (Thursday)', level: 'N5' },
+  { id: 'k9', character: '金', meaning: 'Gold, Money', onyomi: ['キン'], kunyomi: ['かね、かな'], strokes: 8, example: 'きん (gold)', level: 'N5' },
+  { id: 'k10', character: '土', meaning: 'Soil, Earth', onyomi: ['ド'], kunyomi: ['つち'], strokes: 3, example: 'どようび (Saturday)', level: 'N5' },
+  { id: 'k11', character: '語', meaning: 'Language, Word', onyomi: ['ゴ'], kunyomi: ['かた'], strokes: 14, example: 'にほんご (Japanese language)', level: 'N4' },
+  { id: 'k12', character: '学', meaning: 'Study, Learning', onyomi: ['ガク'], kunyomi: ['まなぶ'], strokes: 8, example: 'がくせい (student)', level: 'N4' },
+  { id: 'k13', character: '校', meaning: 'School', onyomi: ['コウ'], kunyomi: [], strokes: 10, example: 'がっこう (school)', level: 'N4' },
+  { id: 'k14', character: '先', meaning: 'Before, Ahead', onyomi: ['セン'], kunyomi: ['さき'], strokes: 6, example: 'せんせい (teacher)', level: 'N4' },
+  { id: 'k15', character: '生', meaning: 'Life, Birth', onyomi: ['セイ'], kunyomi: ['なま、い、なま'], strokes: 5, example: 'せいかつ (living)', level: 'N4' },
+  { id: 'k16', character: '活', meaning: 'Active, Lively', onyomi: ['カツ'], kunyomi: [], strokes: 9, example: 'しゅっせい (active)', level: 'N4' },
+  { id: 'k17', character: '分', meaning: 'Minute, Divide', onyomi: ['フン'], kunyomi: ['わ、ぶん'], strokes: 4, example: 'ぶん (minute)', level: 'N4' },
+  { id: 'k18', character: '聞', meaning: 'Listen, Ask', onyomi: ['ブン'], kunyomi: ['き、きく'], strokes: 14, example: 'きく (to listen)', level: 'N4' },
+  { id: 'k19', character: '読', meaning: 'Read', onyomi: ['ドク'], kunyomi: ['よ'], strokes: 14, example: 'よむ (to read)', level: 'N4' },
+  { id: 'k20', character: '書', meaning: 'Write, Book', onyomi: ['ショ'], kunyomi: ['か'], strokes: 10, example: 'かく (to write)', level: 'N4' },
+  { id: 'k21', character: '駅', meaning: 'Station', onyomi: ['エキ'], kunyomi: [], strokes: 14, example: 'えき (station)', level: 'N3' },
+  { id: 'k22', character: '電', meaning: 'Electricity', onyomi: ['デン'], kunyomi: [], strokes: 13, example: 'でんしゃ (train)', level: 'N3' },
+  { id: 'k23', character: '車', meaning: 'Car, Vehicle', onyomi: ['シャ'], kunyomi: ['くるま'], strokes: 7, example: 'くるま (car)', level: 'N3' },
+  { id: 'k24', character: '門', meaning: 'Gate', onyomi: ['モン'], kunyomi: ['かど'], strokes: 8, example: 'もん (gate)', level: 'N3' },
+  { id: 'k25', character: '駅', meaning: 'Station', onyomi: ['エキ'], kunyomi: [], strokes: 14, example: 'えき (station)', level: 'N3' },
+  { id: 'k26', character: '道', meaning: 'Road, Way', onyomi: ['ドウ'], kunyomi: ['みち'], strokes: 12, example: 'みち (road)', level: 'N3' },
+  { id: 'k27', character: '食', meaning: 'Eat, Food', onyomi: ['ショク'], kunyomi: ['た、くう'], strokes: 9, example: 'たべる (to eat)', level: 'N3' },
+  { id: 'k28', character: '飲', meaning: 'Drink', onyomi: ['イン'], kunyomi: ['の'], strokes: 9, example: 'のむ (to drink)', level: 'N3' },
+  { id: 'k29', character: '買', meaning: 'Buy', onyomi: ['バイ'], kunyomi: ['か'], strokes: 12, example: 'かう (to buy)', level: 'N3' },
+  { id: 'k30', character: '売', meaning: 'Sell', onyomi: ['バイ'], kunyomi: ['う'], strokes: 7, example: 'うる (to sell)', level: 'N3' },
 ]
 
 export interface KanjiProps {
@@ -32,7 +52,8 @@ export interface KanjiProps {
 
 export default function KanjiPractice({ onBack }: KanjiProps) {
   const navigate = useNavigate()
-  const [kanjiList] = useState<Kanji[]>(KANJI_LIST.filter((k) => k.strokes > 0))
+  const [selectedLevel, setSelectedLevel] = useState<'N5' | 'N4' | 'N3'>('N5')
+  const [filteredKanji, setFilteredKanji] = useState<Kanji[]>(() => KANJI_LIST.filter((k) => k.level === 'N5' && k.strokes > 0))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [currentStroke, setCurrentStroke] = useState(0)
   const [totalStrokes, setTotalStrokes] = useState(0)
@@ -50,8 +71,14 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   const pointsRef = useRef<Array<{ x: number; y: number; pressure: number }>>([])
   const strokeHistoryRef = useRef<Array<Array<{ x: number; y: number }>>>([])
 
-  const kanji = kanjiList[currentIndex]
-  const strokeCount = kanji.strokes
+  useEffect(() => {
+    const filtered = KANJI_LIST.filter((k) => k.level === selectedLevel && k.strokes > 0)
+    setFilteredKanji(filtered)
+    setCurrentIndex(0)
+  }, [selectedLevel])
+
+  const kanji = filteredKanji[currentIndex]
+  const strokeCount = kanji?.strokes ?? 0
 
   useEffect(() => {
     setTotalStrokes(strokeCount)
@@ -202,7 +229,7 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
     setTimeout(() => {
       setShowFeedback(false)
       if (feedbackType === 'correct') {
-        if (currentIndex < kanjiList.length - 1) {
+        if (currentIndex < filteredKanji.length - 1) {
           setCurrentIndex((i) => i + 1)
         } else {
           setCompleted(true)
@@ -220,7 +247,43 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   }
 
   const renderCardView = () => (
-    <div className="mb-6 w-full">
+    <div className="mb-6 w-full space-y-4">
+      <div className="flex justify-center gap-2">
+        {(['N5', 'N4', 'N3'] as const).map((lvl) => (
+          <button
+            key={lvl}
+            onClick={() => setSelectedLevel(lvl)}
+            className={`px-4 py-2 rounded-full font-label-caps text-label-caps transition-all squish-click ${
+              selectedLevel === lvl
+                ? 'bg-primary text-on-primary shadow-md'
+                : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-highest'
+            }`}
+          >
+            {lvl}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
+          disabled={currentIndex === 0}
+          className="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant disabled:opacity-30 squish-click"
+        >
+          <span className="material-symbols-outlined">arrow_back</span>
+        </button>
+        <span className="font-label-caps text-label-caps text-on-surface-variant">
+          {currentIndex + 1} / {filteredKanji.length}
+        </span>
+        <button
+          onClick={() => setCurrentIndex((i) => Math.min(filteredKanji.length - 1, i + 1))}
+          disabled={currentIndex === filteredKanji.length - 1}
+          className="p-2 rounded-full hover:bg-surface-container-low transition-colors text-on-surface-variant disabled:opacity-30 squish-click"
+        >
+          <span className="material-symbols-outlined">arrow_forward</span>
+        </button>
+      </div>
+
       <div className={`w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-pointer`} onClick={() => setFlipped(!flipped)}>
         <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm rotate-3 scale-95 translate-y-2 z-0" />
         <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm -rotate-2 scale-[0.98] translate-y-1 z-0" />
@@ -334,7 +397,7 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
       <div className="mt-8 text-center text-on-surface-variant text-sm font-label-caps flex items-center gap-2">
         <span className="material-symbols-outlined text-sm">history</span>
         <span>
-          Next kanji: {kanjiList[currentIndex + 1]?.character || '完成！'}
+            Next kanji: {filteredKanji[currentIndex + 1]?.character || '完成！'}
         </span>
       </div>
     </div>
