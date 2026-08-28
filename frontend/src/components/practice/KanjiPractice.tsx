@@ -50,10 +50,19 @@ export interface KanjiProps {
   onBack?: () => void
 }
 
+const shuffleArray = <T,>(arr: T[]): T[] => {
+  const result = [...arr]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
+
 export default function KanjiPractice({ onBack }: KanjiProps) {
   const navigate = useNavigate()
   const [selectedLevel, setSelectedLevel] = useState<'N5' | 'N4' | 'N3'>('N5')
-  const [filteredKanji, setFilteredKanji] = useState<Kanji[]>(() => KANJI_LIST.filter((k) => k.level === 'N5' && k.strokes > 0))
+  const [filteredKanji, setFilteredKanji] = useState<Kanji[]>(() => shuffleArray(KANJI_LIST.filter((k) => k.level === 'N5' && k.strokes > 0)))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [currentStroke, setCurrentStroke] = useState(0)
   const [totalStrokes, setTotalStrokes] = useState(0)
@@ -66,8 +75,12 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   const [view, setView] = useState<'card' | 'practice'>('card')
   const [swipeX, setSwipeX] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const [shuffling, setShuffling] = useState(false)
   const dragStartX = useRef(0)
   const dragCurrentX = useRef(0)
+  const velocityX = useRef(0)
+  const lastX = useRef(0)
+  const lastTime = useRef(0)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
@@ -76,9 +89,10 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   const strokeHistoryRef = useRef<Array<Array<{ x: number; y: number }>>>([])
 
   useEffect(() => {
-    const filtered = KANJI_LIST.filter((k) => k.level === selectedLevel && k.strokes > 0)
-    setFilteredKanji(filtered)
+    setShuffling(true)
+    setFilteredKanji(shuffleArray(KANJI_LIST.filter((k) => k.level === selectedLevel && k.strokes > 0)))
     setCurrentIndex(0)
+    setTimeout(() => setShuffling(false), 500)
   }, [selectedLevel])
 
   const kanji = filteredKanji[currentIndex]
@@ -242,6 +256,16 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
     }, 2000)
   }
 
+  const handleShuffle = () => {
+    setShuffling(true)
+    setFlipped(false)
+    setTimeout(() => {
+      setFilteredKanji(shuffleArray(KANJI_LIST.filter((k) => k.level === selectedLevel && k.strokes > 0)))
+      setCurrentIndex(0)
+      setShuffling(false)
+    }, 250)
+  }
+
   const handleBack = () => {
     if (onBack) {
       onBack()
@@ -253,11 +277,21 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   const handleDragStart = (clientX: number) => {
     dragStartX.current = clientX
     dragCurrentX.current = clientX
+    lastX.current = clientX
+    lastTime.current = performance.now()
+    velocityX.current = 0
     setIsDragging(true)
   }
 
   const handleDragMove = (clientX: number) => {
     if (!isDragging) return
+    const now = performance.now()
+    const dt = now - lastTime.current
+    if (dt > 0) {
+      velocityX.current = (clientX - lastX.current) / dt
+    }
+    lastX.current = clientX
+    lastTime.current = now
     dragCurrentX.current = clientX
     setSwipeX(dragCurrentX.current - dragStartX.current)
   }
@@ -265,11 +299,14 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
   const handleDragEnd = () => {
     if (!isDragging) return
     const delta = dragCurrentX.current - dragStartX.current
-    const threshold = 80
+    const velocity = velocityX.current
+    const threshold = 60
+    const shouldGoNext = delta < -threshold || (delta < 0 && velocity < -0.3)
+    const shouldGoPrev = delta > threshold || (delta > 0 && velocity > 0.3)
 
-    if (delta < -threshold && currentIndex < filteredKanji.length - 1) {
+    if (shouldGoNext && currentIndex < filteredKanji.length - 1) {
       setCurrentIndex((i) => i + 1)
-    } else if (delta > threshold && currentIndex > 0) {
+    } else if (shouldGoPrev && currentIndex > 0) {
       setCurrentIndex((i) => i - 1)
     }
 
@@ -307,60 +344,93 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
         ))}
       </div>
 
-      <div
-        className="w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-grab active:cursor-grabbing select-none"
-        style={{ touchAction: 'none' }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={onPointerUp}
-      >
-        <div
-          className="w-full h-full transition-transform duration-300 ease-out"
-          style={{ transform: `translateX(${swipeX}px) rotate(${swipeX * 0.05}deg)` }}
+      <div className="flex justify-center">
+        <button
+          onClick={handleShuffle}
+          disabled={shuffling}
+          className="p-2 rounded-full bg-surface-container text-on-surface-variant hover:bg-surface-container-highest transition-all squish-click disabled:opacity-50"
         >
-          <div className={`w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-pointer`} onClick={() => setFlipped(!flipped)}>
-            <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm rotate-3 scale-95 translate-y-2 z-0" />
-            <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm -rotate-2 scale-[0.98] translate-y-1 z-0" />
-            <div className={`flip-card w-full h-full relative z-10 ${flipped ? 'flipped' : ''}`}>
-              <div className="flip-card-inner w-full h-full relative rounded-3xl shadow-[0_8px_24px_rgba(134,78,90,0.1)] transition-transform duration-500">
-                <div className="flip-card-front absolute inset-0 bg-surface-container-lowest border border-outline-variant/50 rounded-3xl flex flex-col items-center justify-center p-8">
-                  <span className="font-display-jp text-display-jp text-on-surface mb-4">
-                    {kanji.character}
-                  </span>
-                  <div className="absolute bottom-6 flex flex-col items-center opacity-60">
-                    <span className="material-symbols-outlined mb-1">touch_app</span>
-                    <span className="font-label-caps text-label-caps text-on-surface-variant">Tap to flip</span>
+          <span className={`material-symbols-outlined ${shuffling ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>
+            shuffle
+          </span>
+        </button>
+      </div>
+
+      <div className="relative w-full">
+        <div
+          className="w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-grab active:cursor-grabbing select-none mx-auto"
+          style={{ touchAction: 'none' }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerLeave={onPointerUp}
+        >
+          <div
+            className={`w-full h-full ${isDragging ? 'transition-none' : 'transition-transform duration-300 ease-out'}`}
+            style={{ transform: `translateX(${swipeX}px) rotate(${swipeX * 0.05}deg)`, willChange: 'transform' }}
+          >
+            <div className={`w-full aspect-[3/4] sm:aspect-square relative perspective-1000 cursor-pointer`} onClick={() => setFlipped(!flipped)}>
+              <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm rotate-3 scale-95 translate-y-2 z-0" />
+              <div className="absolute inset-0 bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-sm -rotate-2 scale-[0.98] translate-y-1 z-0" />
+              <div className={`flip-card w-full h-full relative z-10 ${flipped ? 'flipped' : ''} ${shuffling ? 'shuffle-animate' : ''}`}>
+                <div className="flip-card-inner w-full h-full relative rounded-3xl shadow-[0_8px_24px_rgba(134,78,90,0.1)] transition-transform duration-500">
+                  <div className="flip-card-front absolute inset-0 bg-surface-container-lowest border border-outline-variant/50 rounded-3xl flex flex-col items-center justify-center p-8">
+                    <span className="font-display-jp text-display-jp text-on-surface mb-4">
+                      {kanji.character}
+                    </span>
+                    <div className="absolute bottom-6 flex flex-col items-center opacity-60">
+                      <span className="material-symbols-outlined mb-1">touch_app</span>
+                      <span className="font-label-caps text-label-caps text-on-surface-variant">Tap to flip</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-linear-to-br from-surface-container-lowest to-surface-container">
-                  <span className="text-sm font-label-caps text-label-caps text-primary mb-1">
-                    {kanji.meaning}
-                  </span>
-                  <div className="w-full text-left mt-4 space-y-3">
-                    <div>
-                      <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Onyomi</span>
-                      <p className="font-display-jp text-display-jp text-on-surface text-2xl">
-                        {kanji.onyomi.join('、')}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Kunyomi</span>
-                      <p className="font-display-jp text-display-jp text-on-surface text-2xl">
-                        {kanji.kunyomi.join('、')}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Example</span>
-                      <p className="font-body-md text-body-md text-on-surface-variant mt-1">
-                        {kanji.example}
-                      </p>
+                  <div className="flip-card-back absolute inset-0 bg-surface-container-lowest border border-primary-container rounded-3xl flex flex-col items-center justify-center p-8 text-center bg-linear-to-br from-surface-container-lowest to-surface-container">
+                    <span className="text-sm font-label-caps text-label-caps text-primary mb-1">
+                      {kanji.meaning}
+                    </span>
+                    <div className="w-full text-left mt-4 space-y-3">
+                      <div>
+                        <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Onyomi</span>
+                        <p className="font-display-jp text-display-jp text-on-surface text-2xl">
+                          {kanji.onyomi.join('、')}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Kunyomi</span>
+                        <p className="font-display-jp text-display-jp text-on-surface text-2xl">
+                          {kanji.kunyomi.join('、')}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider text-xs">Example</span>
+                        <p className="font-body-md text-body-md text-on-surface-variant mt-1">
+                          {kanji.example}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="hidden sm:flex absolute top-1/2 -translate-y-1/2 left-0 -ml-4 z-20">
+          <button
+            onClick={() => { setCurrentIndex((i) => Math.max(0, i - 1)); setSwipeX(0); setFlipped(false); }}
+            disabled={currentIndex === 0}
+            className="p-3 rounded-full bg-surface-container-low/90 backdrop-blur-sm border border-outline-variant shadow-md text-on-surface-variant hover:bg-surface-container disabled:opacity-30 transition-all squish-click"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+        </div>
+        <div className="hidden sm:flex absolute top-1/2 -translate-y-1/2 right-0 -mr-4 z-20">
+          <button
+            onClick={() => { setCurrentIndex((i) => Math.min(filteredKanji.length - 1, i + 1)); setSwipeX(0); setFlipped(false); }}
+            disabled={currentIndex === filteredKanji.length - 1}
+            className="p-3 rounded-full bg-surface-container-low/90 backdrop-blur-sm border border-outline-variant shadow-md text-on-surface-variant hover:bg-surface-container disabled:opacity-30 transition-all squish-click"
+          >
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </button>
         </div>
       </div>
 
@@ -369,7 +439,7 @@ export default function KanjiPractice({ onBack }: KanjiProps) {
           {currentIndex + 1} / {filteredKanji.length}
         </span>
       </div>
-      <div className="mt-6 flex justify-center">
+      <div className="mt-2 flex justify-center">
         <button
           onClick={() => setView('practice')}
           className="bg-secondary text-white font-bold py-4 px-8 rounded-xl shadow-lg active:scale-95 transition-transform squishy-btn flex items-center justify-center gap-2"
