@@ -57,37 +57,51 @@ class ProgressController extends Controller
     public function dailyGoal(Request $request): JsonResponse
     {
         $userId = $request->attributes->get('supabase_user_id');
+        $fallback = ['completed' => 0, 'total' => 5, 'xp' => 0];
 
         if (!$this->supabase->isConfigured()) {
             return response()->json([
                 'success' => true,
-                'data' => ['completed' => 3, 'total' => 5, 'xp' => 1250],
-                'message' => 'Supabase not configured - returning sample data',
+                'data' => $fallback,
+                'message' => 'Supabase not configured',
             ]);
         }
 
         try {
-            $response = $this->supabase->rpc('get_daily_goal', [
-                'user_id' => $userId ?? '',
+            $today = now()->toDateString();
+            $response = $this->supabase->get('daily_goals', [
+                'user_id' => 'eq.' . $userId,
+                'date' => 'eq.' . $today,
+                'select' => 'completed,total,xp',
             ], true);
 
-            if ($response->failed()) {
-                return response()->json([
-                    'success' => true,
-                    'data' => ['completed' => 3, 'total' => 5, 'xp' => 1250],
-                    'message' => 'Using fallback data',
-                ]);
+            if ($response->successful()) {
+                $rows = $response->json();
+                $row = is_array($rows) && isset($rows[0]) && is_array($rows[0])
+                    ? $rows[0]
+                    : (is_array($rows) && isset($rows['xp']) ? $rows : null);
+
+                if ($row) {
+                    return response()->json([
+                        'success' => true,
+                        'data' => [
+                            'completed' => (int) ($row['completed'] ?? 0),
+                            'total' => (int) ($row['total'] ?? 5),
+                            'xp' => (int) ($row['xp'] ?? 0),
+                        ],
+                    ]);
+                }
             }
 
             return response()->json([
                 'success' => true,
-                'data' => $response->json(),
+                'data' => $fallback,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => true,
-                'data' => ['completed' => 3, 'total' => 5, 'xp' => 1250],
-                'message' => 'Supabase unavailable - returning sample data',
+                'data' => $fallback,
+                'message' => 'Supabase unavailable',
             ]);
         }
     }

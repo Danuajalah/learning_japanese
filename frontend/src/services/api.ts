@@ -3,6 +3,18 @@ import type { Lesson, UserProgress, DailyGoal, UserProfile, ApiResponse, Convers
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
 
+function normalizeDailyGoal(data: unknown): DailyGoal | null {
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row || typeof row !== 'object') return null
+
+  const value = row as Record<string, unknown>
+  return {
+    completed: Number(value.completed) || 0,
+    total: Number(value.total) || 5,
+    xp: Number(value.xp) || 0,
+  }
+}
+
 async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const { data: { session } } = await supabase.auth.getSession()
 
@@ -78,12 +90,13 @@ export class LearningService {
   }
 
   static async getDailyGoal(): Promise<DailyGoal> {
+    const fallback: DailyGoal = { completed: 0, total: 5, xp: 0 }
     try {
-      const res = await apiFetch<DailyGoal>('/progress/daily-goal')
-      if (!res.success) return { completed: 0, total: 5, xp: 0 }
-      return res.data || { completed: 0, total: 5, xp: 0 }
+      const res = await apiFetch<DailyGoal | DailyGoal[]>('/progress/daily-goal')
+      if (!res.success) return fallback
+      return normalizeDailyGoal(res.data) ?? fallback
     } catch {
-      return { completed: 0, total: 5, xp: 0 }
+      return fallback
     }
   }
 

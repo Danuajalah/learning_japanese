@@ -6,8 +6,9 @@ interface DailyGoalProps {
   xp: number
 }
 
-export default function DailyGoalCard({ completed, total }: DailyGoalProps) {
-  const percentage = Math.round((completed / total) * 100)
+export default function DailyGoalCard({ completed, total, xp }: DailyGoalProps) {
+  const safeTotal = total > 0 ? total : 1
+  const percentage = Math.round((completed / safeTotal) * 100)
 
   return (
     <section
@@ -30,7 +31,7 @@ export default function DailyGoalCard({ completed, total }: DailyGoalProps) {
             {completed}/{total} Lessons
           </p>
           <span className="font-label-caps text-label-caps text-primary bg-primary-container px-2 py-1 rounded-md">
-            {percentage}%
+            {xp} XP · {percentage}%
           </span>
         </div>
         <div className="w-full bg-surface-variant rounded-full h-3">

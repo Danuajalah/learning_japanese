@@ -21,7 +21,13 @@ export default function Dashboard() {
       <TopAppBar />
       <DesktopNav active="map" />
       <main className="px-container-margin py-6 max-w-lg mx-auto md:max-w-4xl relative z-10">
-        {!loading && <DailyGoalCard {...dailyGoal} />}
+        {!loading && (
+          <DailyGoalCard
+            completed={dailyGoal.completed}
+            total={dailyGoal.total}
+            xp={dailyGoal.xp}
+          />
+        )}
         <LearningRoadmap />
       </main>
       <BottomNavBar active="map" />
