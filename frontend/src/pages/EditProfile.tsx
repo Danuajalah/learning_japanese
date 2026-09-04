@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopAppBar, BottomNavBar, DesktopNav } from '@/components'
 import { LearningService } from '@/services/api'
@@ -18,6 +18,8 @@ export default function EditProfile() {
   const [gender, setGender] = useState('')
   const [phone, setPhone] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const avatarInputRef = useRef<HTMLInputElement>(null)
 
   const loadProfile = useCallback(async () => {
     const p = await LearningService.getUserProfile()
@@ -62,6 +64,31 @@ export default function EditProfile() {
       setError('Gagal menyimpan perubahan')
       setSaving(false)
     }
+  }
+
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setError('Pilih file gambar yang valid')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Ukuran foto maksimal 5 MB')
+      return
+    }
+
+    setUploadingAvatar(true)
+    setError(null)
+    const uploadedUrl = await LearningService.uploadAvatar(file)
+    if (uploadedUrl) {
+      setAvatarUrl(uploadedUrl)
+    } else {
+      setError('Gagal mengunggah foto profil')
+    }
+    setUploadingAvatar(false)
   }
 
   if (loading) {
@@ -109,12 +136,22 @@ export default function EditProfile() {
                 </div>
                 <button
                   type="button"
+                  aria-label="Pilih foto profil"
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={uploadingAvatar}
                   className="absolute bottom-0 right-0 bg-secondary p-3 rounded-full text-white shadow-md hover:scale-105 transition-transform"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                    photo_camera
+                  <span className={`material-symbols-outlined ${uploadingAvatar ? 'animate-spin' : ''}`} style={{ fontSize: 20 }}>
+                    {uploadingAvatar ? 'sync' : 'photo_camera'}
                   </span>
                 </button>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
               </div>
               <p className="mt-4 text-on-surface text-sm font-semibold tracking-wide">
                 Ubah Foto Profil

@@ -46,6 +46,31 @@ async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 }
 
 export class LearningService {
+  static async uploadAvatar(file: File): Promise<string | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
+
+      const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+      const path = `${user.id}/${crypto.randomUUID()}.${extension}`
+      const { error } = await supabase.storage.from('avatars').upload(path, file, {
+        contentType: file.type,
+        upsert: false,
+      })
+
+      if (error) {
+        console.error('Avatar upload error:', error)
+        return null
+      }
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      return data.publicUrl
+    } catch (error) {
+      console.error('Avatar upload error:', error)
+      return null
+    }
+  }
+
   static async getUserProfile(): Promise<UserProfile | null> {
     try {
       const res = await apiFetch<UserProfile>('/user')
